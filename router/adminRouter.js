@@ -6,6 +6,7 @@ const {
 } = require("../controller/admin/loginSingupController");
 const {
   addUserValidators,
+  addUserValidatorsHandler,
 } = require("../middlewares/admin/users/userValidator");
 
 const router = express.Router();
@@ -17,6 +18,14 @@ router.get("/", (req, res, next) => {
 });
 
 // sing up route
-router.post("/user", addUserValidators, singupController);
+router.post(
+  "/singup",
+  addUserValidators,
+  addUserValidatorsHandler,
+  singupController
+);
+
+//login router
+router.post("singin");
 
 module.exports = router;

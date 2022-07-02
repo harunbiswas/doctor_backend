@@ -1,6 +1,6 @@
-const { check } = require("express-validator");
+const { check, validationResult } = require("express-validator");
+const createHttpError = require("http-errors");
 const createError = require("http-errors");
-const mysql = require("mysql");
 const con = require("../../../database/dbConnection");
 
 // add user
@@ -18,26 +18,44 @@ const addUserValidators = [
     .withMessage("Name must me alphabet")
     .trim(),
 
-  check("email")
-    .isEmail()
-    .withMessage("Invalid email address")
-    .trim()
-    .custom(async (value) => {
-      try {
-        const user = con.query(`SELECT email FROM admins`, (err, rows) => {
-          if (err) {
-            console.log("errors");
-          } else {
-            if (user) {
-              console.log(user);
-              throw createError("Email alreadt is use!");
-            }
-          }
-        });
-      } catch (err) {
-        throw createError(err.message);
-      }
-    }),
+  check("email").isEmail().withMessage("Invalid email address").trim(),
+  check("password").isStrongPassword().withMessage("Password must be strong!"),
 ];
 
-module.exports = { addUserValidators };
+// add user validator handler
+const addUserValidatorsHandler = function (req, res, next) {
+  const errors = validationResult(req);
+
+  const mappedErrors = errors.mapped();
+
+  if (Object.keys(mappedErrors).length === 0) {
+    const sql = `SELECT * FROM admins WHERE email = ${JSON.stringify(
+      req.body.email
+    )}`;
+    con.query(sql, (err, rows) => {
+      if (err) {
+      } else {
+        if (rows.length > 0) {
+          mappedErrors.email = {
+            msg: "Email is alrady use!",
+            value: req.body.email,
+            param: "email",
+            location: "body",
+          };
+          res.status(400);
+          res.json(mappedErrors);
+        } else {
+          next();
+        }
+      }
+    });
+  } else {
+    res.status(400);
+    res.json(mappedErrors);
+  }
+};
+
+// login validator
+const loginUserValidators = [check("email")];
+
+module.exports = { addUserValidators, addUserValidatorsHandler };
