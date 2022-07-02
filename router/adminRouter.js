@@ -5,6 +5,8 @@ const {
   singupController,
   login,
   addUser,
+  getUser,
+  deleteUser,
 } = require("../controller/admin/loginSingupController");
 const {
   doLoginValidators,
@@ -33,6 +35,12 @@ router.post(
   checkLogin,
   addUser
 );
+
+// user list
+router.get("/user", checkLogin, getUser);
+
+// delete user
+router.delete("/user", checkLogin, deleteUser);
 
 //login router
 router.post("/singin", doLoginValidators, doLoginValidatorsResust, login);
