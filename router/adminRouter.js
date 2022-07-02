@@ -3,11 +3,18 @@ const express = require("express");
 // internal imports
 const {
   singupController,
+  login,
+  addUser,
 } = require("../controller/admin/loginSingupController");
+const {
+  doLoginValidators,
+  doLoginValidatorsResust,
+} = require("../middlewares/admin/login/loginValidator");
 const {
   addUserValidators,
   addUserValidatorsHandler,
 } = require("../middlewares/admin/users/userValidator");
+const { checkLogin } = require("../middlewares/common/checkLogin");
 
 const router = express.Router();
 
@@ -22,10 +29,12 @@ router.post(
   "/singup",
   addUserValidators,
   addUserValidatorsHandler,
-  singupController
+  singupController,
+  checkLogin,
+  addUser
 );
 
 //login router
-router.post("singin");
+router.post("/singin", doLoginValidators, doLoginValidatorsResust, login);
 
 module.exports = router;

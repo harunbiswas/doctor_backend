@@ -55,7 +55,4 @@ const addUserValidatorsHandler = function (req, res, next) {
   }
 };
 
-// login validator
-const loginUserValidators = [check("email")];
-
 module.exports = { addUserValidators, addUserValidatorsHandler };
