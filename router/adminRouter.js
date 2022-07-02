@@ -1,4 +1,9 @@
 const express = require("express");
+const {
+  addBlog,
+  getBlogs,
+  getSingleBlog,
+} = require("../controller/admin/blogs/blogController");
 
 // internal imports
 const {
@@ -7,7 +12,11 @@ const {
   addUser,
   getUser,
   deleteUser,
-} = require("../controller/admin/loginSingupController");
+} = require("../controller/admin/loginSignup/loginSingupController");
+const {
+  addBlogValidators,
+  addBlogValidatorsResust,
+} = require("../middlewares/admin/blog/addBlogValidators");
 const {
   doLoginValidators,
   doLoginValidatorsResust,
@@ -45,4 +54,20 @@ router.delete("/user", checkLogin, deleteUser);
 //login router
 router.post("/singin", doLoginValidators, doLoginValidatorsResust, login);
 
+// blogs
+
+// add blog
+router.post(
+  "/blog",
+  checkLogin,
+  addBlogValidators,
+  addBlogValidatorsResust,
+  addBlog
+);
+
+// getBlogs
+router.get("/blogs", checkLogin, getBlogs);
+
+// get single blog
+router.get("/blog/:id", checkLogin, getSingleBlog);
 module.exports = router;

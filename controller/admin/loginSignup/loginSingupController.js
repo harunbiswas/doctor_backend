@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const con = require("../../database/dbConnection");
+const con = require("../../../database/dbConnection");
 const jwt = require("jsonwebtoken");
 const dotent = require("dotenv");
 
