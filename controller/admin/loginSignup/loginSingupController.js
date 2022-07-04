@@ -2,18 +2,20 @@ const bcrypt = require("bcrypt");
 const con = require("../../../database/dbConnection");
 const jwt = require("jsonwebtoken");
 const dotent = require("dotenv");
+const { json } = require("express");
 
 dotent.config();
 
 // inser user
 const insartFunc = (con, data, res) => {
-  const sql = `INSERT INTO admins (firstName, lastName, email, hash, role) VALUES (${JSON.stringify(
+  const sql = `INSERT INTO admins (firstName, lastName, email, password, role) VALUES (${JSON.stringify(
     data.firstName
   )}, ${JSON.stringify(data.lastName)}, ${JSON.stringify(
     data.email
   )},${JSON.stringify(data.hashedPassword)},${JSON.stringify(data.role)})`;
   con.query(sql, (err) => {
     if (err) {
+      console.log(err);
       res.status(500);
       res.json({
         errors: {
@@ -144,12 +146,15 @@ async function login(req, res, next) {
           firstName,
           lastName,
           email,
-          hash,
+          password,
           role,
           createAt,
           updateAt,
         } = rows[0];
-        const isValidPassword = await bcrypt.compare(req.body.password, hash);
+        const isValidPassword = await bcrypt.compare(
+          req.body.password,
+          password
+        );
         if (isValidPassword) {
           const userObject = {
             id,
