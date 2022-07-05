@@ -2,37 +2,65 @@ const con = require("../../../database/dbConnection");
 
 // inser blog
 const inserBlog = (con, data, res) => {
-  //   console.log(typeof JSON.stringify(data.tags));
-  const sql = `INSERT INTO blogs( title, creatorID, description, creatorName, image, tags) VALUES (${JSON.stringify(
+  const sql = `INSERT INTO blogs( title, creatorID, description, creatorName, thumbnail, tags) VALUES (${JSON.stringify(
     data.title
   )},${data.creatorID}, ${JSON.stringify(data.description)}, ${JSON.stringify(
     data.creatorName
-  )}, ${JSON.stringify(data.image)}, ${JSON.stringify(data.tags)} )`;
+  )}, ${JSON.stringify(data.thumnel)}, ${JSON.stringify(data.tags)} )`;
 
   con.query(sql, (err) => {
     if (err) {
-      console.log(err);
-      res.status(500).json("Internal server errors!");
+      res.status(400).json("Internal server errors!");
     } else {
       res.status(200).json("Blog add successfull");
     }
   });
 };
 
+// update blog query
+const updateBlog = (con, data, res) => {
+  const sql = `UPDATE blogs SET departmentID=null,thumbnail = ${JSON.stringify(
+    data.thumnel
+  )},title=${JSON.stringify(
+    data.title
+  )},date=null,timeToRead=null,description=${JSON.stringify(
+    data.description
+  )},tags=${JSON.stringify(data.tags)} WHERE id = ${data.id}`;
+
+  con.query(sql, (err) => {
+    if (err) {
+      // console.log(err);
+      res.status(400).json("Internal server errors!");
+    } else {
+      res.status(200).json("Blog update successfull");
+    }
+  });
+};
+
 // add blog
 async function addBlog(req, res, next) {
-  const { title, description, tags, file } = req.body;
+  const { title, description, tags } = req.body;
   if (req.user) {
-    const data = {
-      title,
-      description,
-      tags,
-      image: "",
-      creatorID: req.user.id,
-      creatorName: req.user.firstName + " " + req.user.lastName,
-    };
+    if (req.files && req.files.length > 0) {
+      const data = {
+        title,
+        description,
+        tags,
+        creatorID: req.user.id,
+        creatorName: req.user.firstName + " " + req.user.lastName,
+        thumnel: req.files[0].path,
+      };
 
-    inserBlog(con, data, res);
+      inserBlog(con, data, res);
+    } else {
+      res.status(500).json({
+        errors: {
+          image: {
+            msg: "Blog thumnul image is require!",
+          },
+        },
+      });
+    }
   } else {
     res.status(400).json({
       errors: {
@@ -88,5 +116,42 @@ async function getSingleBlog(req, res, next) {
     });
   }
 }
+
+// update blog
+async function updateSingleBlog(req, res, next) {
+  const { title, description, tags } = req.body;
+  if (req.user) {
+    const id = req.params.id;
+    con.query(`SELECT * FROM blogs WHERE id=${id}`, (err, rows) => {
+      if (err) {
+        res.status(400).json({
+          errors: {
+            common: "Internal server errors",
+          },
+        });
+      } else {
+        const data = {
+          id,
+          title,
+          description,
+          tags,
+          creatorID: req.user.id,
+          creatorName: req.user.firstName + " " + req.user.lastName,
+          thumnel: req.files.length > 0 ? req.files[0].path : rows[0].thumbnail,
+        };
+
+        updateBlog(con, data, res);
+      }
+    });
+  } else {
+    res.status(400).json({
+      errors: {
+        common: {
+          msg: "Authentication failure!",
+        },
+      },
+    });
+  }
+}
 // module exports
-module.exports = { addBlog, getBlogs, getSingleBlog };
+module.exports = { addBlog, getBlogs, getSingleBlog, updateSingleBlog };

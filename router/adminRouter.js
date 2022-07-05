@@ -3,6 +3,7 @@ const {
   addBlog,
   getBlogs,
   getSingleBlog,
+  updateSingleBlog,
 } = require("../controller/admin/blogs/blogController");
 
 // internal imports
@@ -13,6 +14,7 @@ const {
   getUser,
   deleteUser,
 } = require("../controller/admin/loginSignup/loginSingupController");
+const fileUpload = require("../helpers/admin/fileUploader");
 const {
   addBlogValidators,
   addBlogValidatorsResust,
@@ -26,6 +28,7 @@ const {
   addUserValidatorsHandler,
 } = require("../middlewares/admin/users/userValidator");
 const { checkLogin } = require("../middlewares/common/checkLogin");
+const singleUploader = require("../utilities/admin/singleUploader");
 
 const router = express.Router();
 
@@ -60,6 +63,7 @@ router.post("/singin", doLoginValidators, doLoginValidatorsResust, login);
 router.post(
   "/blog",
   checkLogin,
+  fileUpload,
   addBlogValidators,
   addBlogValidatorsResust,
   addBlog
@@ -70,4 +74,12 @@ router.get("/blogs", checkLogin, getBlogs);
 
 // get single blog
 router.get("/blog/:id", checkLogin, getSingleBlog);
+// update blog
+router.put(
+  "/blog/:id",
+  checkLogin,
+  fileUpload,
+  addBlogValidators,
+  updateSingleBlog
+);
 module.exports = router;
