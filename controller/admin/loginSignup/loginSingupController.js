@@ -7,7 +7,7 @@ dotent.config();
 
 // inser user
 const insartFunc = (con, data, res) => {
-  const sql = `INSERT INTO admins (firstName, lastName, email, password, role) VALUES (${JSON.stringify(
+  const sql = `INSERT INTO users (firstName, lastName, email, password, role) VALUES (${JSON.stringify(
     data.firstName
   )}, ${JSON.stringify(data.lastName)}, ${JSON.stringify(
     data.email
@@ -19,7 +19,7 @@ const insartFunc = (con, data, res) => {
       res.json({
         errors: {
           common: {
-            msg: "Unkhown Error occured!",
+            msg: "Internal server error!",
           },
         },
       });
@@ -34,11 +34,12 @@ const insartFunc = (con, data, res) => {
 async function singupController(req, res, next) {
   const { firstName, lastName, email, password, role } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
-  const selectSQL = `SELECT * FROM admins`;
+  const selectSQL = `SELECT * FROM users`;
 
   con.query(selectSQL, (err, rows) => {
     if (err) {
       console.log(err);
+      res.status(400).json("Internal serever error");
     } else {
       if (rows.length === 0) {
         const data = {
@@ -125,7 +126,7 @@ async function getUser(req, res, next) {
 // do login
 async function login(req, res, next) {
   // process login
-  const sql = `SELECT * FROM admins WHERE email =${JSON.stringify(
+  const sql = `SELECT * FROM users WHERE email =${JSON.stringify(
     req.body.email
   )}`;
 
@@ -134,7 +135,7 @@ async function login(req, res, next) {
       res.status(500).json({
         errors: {
           common: {
-            msg: "Unkhown Error occured!",
+            msg: "Internal server err",
           },
         },
       });

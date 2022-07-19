@@ -1,23 +1,42 @@
 const bcrypt = require("bcrypt");
 const con = require("../../../database/dbConnection");
 
-// inser blog
+// inser clinic
 const inserClinic = (con, data, res) => {
-  const sql = `INSERT INTO clinics( name, email, phone, image, password, address, latitude, longitude) VALUES (${JSON.stringify(
+  const sql = `INSERT INTO users( firstName, email, password, role) VALUES (${JSON.stringify(
     data.name
   )}, ${JSON.stringify(data.email)}, ${JSON.stringify(
-    data.phone
-  )}, ${JSON.stringify(data.image)}, ${JSON.stringify(
     data.password
-  )} , ${JSON.stringify(data.address)}, ${JSON.stringify(
-    data.latitude
-  )} , ${JSON.stringify(data.longitude)}  )`;
+  )} , "clinic")`;
 
   con.query(sql, (err) => {
     if (err) {
-      res.status(400).json("Internal server errors!");
+      res.status(500).json("Internal server errors!");
     } else {
-      res.status(200).json("Blog add successfull");
+      con.query(
+        `SELECT * FROM users WHERE email = ${JSON.stringify(data.email)}`,
+        (err2, rows) => {
+          if (err2) {
+            res.status(500).json("Internal server errors!");
+          } else {
+            const sql2 = `INSERT INTO clinics( userId, phone, image, address, latitude, longitude) VALUES (${JSON.stringify(
+              rows[0].id
+            )}, ${JSON.stringify(data.phone)}, ${JSON.stringify(
+              data.image
+            )}, ${JSON.stringify(data.address)}, ${JSON.stringify(
+              data.latitude
+            )} , ${JSON.stringify(data.longitude)})`;
+
+            con.query(sql2, (err3) => {
+              if (err3) {
+                res.status(500).json("Internal server errors!");
+              } else {
+                res.status(200).json("Clinic create successfull!");
+              }
+            });
+          }
+        }
+      );
     }
   });
 };
@@ -47,34 +66,25 @@ async function addClinic(req, res, next) {
   const { name, phone, email, password, address, latitude, longitude } =
     req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
-  if (req.user) {
-    if (req.files && req.files.length > 0) {
-      const data = {
-        name,
-        phone,
-        email,
-        password: hashedPassword,
-        address,
-        latitude,
-        longitude,
-        image: req.files[0].path,
-      };
 
-      inserClinic(con, data, res);
-    } else {
-      res.status(500).json({
-        errors: {
-          image: {
-            msg: "Clinic Profile image is require!",
-          },
-        },
-      });
-    }
+  if (req.files && req.files.length > 0) {
+    const data = {
+      name,
+      phone,
+      email,
+      password: hashedPassword,
+      address,
+      latitude,
+      longitude,
+      image: req.files[0].path,
+    };
+
+    inserClinic(con, data, res);
   } else {
-    res.status(400).json({
+    res.status(500).json({
       errors: {
-        common: {
-          msg: "Authentication failure!",
+        image: {
+          msg: "Clinic Profile image is require!",
         },
       },
     });

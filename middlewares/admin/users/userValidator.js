@@ -29,11 +29,12 @@ const addUserValidatorsHandler = function (req, res, next) {
   const mappedErrors = errors.mapped();
 
   if (Object.keys(mappedErrors).length === 0) {
-    const sql = `SELECT * FROM admins WHERE email = ${JSON.stringify(
+    const sql = `SELECT * FROM users WHERE email = ${JSON.stringify(
       req.body.email
     )}`;
     con.query(sql, (err, rows) => {
       if (err) {
+        res.status(400).json("Internal server errors!");
       } else {
         if (rows.length > 0) {
           mappedErrors.email = {

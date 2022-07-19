@@ -44,7 +44,7 @@ const addClinicValidationResult = function (req, res, next) {
   const mappedErrors = errors.mapped();
 
   if (Object.keys(mappedErrors).length === 0) {
-    const sql = `SELECT * FROM clinics WHERE email = ${JSON.stringify(
+    const sql = `SELECT * FROM users WHERE email = ${JSON.stringify(
       req.body.email
     )}`;
 
@@ -59,17 +59,27 @@ const addClinicValidationResult = function (req, res, next) {
             param: "email",
             location: "body",
           };
-          const { filename } = req.files[0];
-          unlink(
-            path.join(__dirname, `../../../public/images/blog/${filename}`),
-            (err) => {
-              if (err) {
-                console.log(err);
-              } else {
-                res.status(500).json(mappedErrors);
+          if (req.files.length > 0) {
+            const { filename } = req.files[0];
+            unlink(
+              path.join(__dirname, `../../../public/images/photo/${filename}`),
+              (err) => {
+                if (err) {
+                  console.log(err);
+                } else {
+                  res.status(500).json(mappedErrors);
+                }
               }
-            }
-          );
+            );
+          } else {
+            res.status(400).json({
+              errors: {
+                file: {
+                  msg: "Clinic image is requires",
+                },
+              },
+            });
+          }
         } else {
           next();
         }
@@ -83,14 +93,14 @@ const addClinicValidationResult = function (req, res, next) {
         path.join(__dirname, `../../../public/images/blog/${filename}`),
         (err) => {
           if (err) {
-            console.log(err);
+            res.status(500).json("Internal Server Errors");
           } else {
-            res.status(500).json(mappedErrors);
+            res.status(400).json(mappedErrors);
           }
         }
       );
     } else {
-      res.status(500).json(mappedErrors);
+      res.status(400).json(mappedErrors);
     }
   }
 };

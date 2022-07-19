@@ -13,6 +13,8 @@ const con = require("./database/dbConnection");
 const frontendRouter = require("./router/frontendRouter");
 const adminRouter = require("./router/adminRouter");
 const dashboardRouter = require("./router/dashboardRouter");
+const doctorRouter = require("./router/doctorRouter");
+const clinicRouter = require("./router/clinicRouter");
 
 // start project
 const app = express();
@@ -46,6 +48,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", frontendRouter);
 app.use("/admin", adminRouter);
 app.use("/dashboard", dashboardRouter);
+app.use("/doctor", doctorRouter);
+app.use("/clinic", clinicRouter);
 
 // 404 handler
 app.use(notFoundHandler);
