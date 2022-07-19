@@ -7,4 +7,6 @@ router.get("/", (req, res, next) => {
   res.json("Frontend page!");
 });
 
+router.post("/singin");
+
 module.exports = router;

@@ -2,7 +2,6 @@ const bcrypt = require("bcrypt");
 const con = require("../../../database/dbConnection");
 const jwt = require("jsonwebtoken");
 const dotent = require("dotenv");
-const { json } = require("express");
 
 dotent.config();
 

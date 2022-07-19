@@ -1,4 +1,5 @@
 const con = require("../../../database/dbConnection");
+const { unlink } = require("fs");
 
 // inser blog
 const inserBlog = (con, data, res) => {
@@ -153,5 +154,50 @@ async function updateSingleBlog(req, res, next) {
     });
   }
 }
+
+// blog delete
+async function deleteBlog(req, res, next) {
+  if (req.user) {
+    const { id } = req.params;
+    const sql = `SELECT * FROM blogs WHERE id=${id}`;
+
+    con.query(sql, (err, rows) => {
+      if (err) {
+        res.status(400).json("Internal server errors");
+      } else {
+        unlink(rows[0].thumbnail, (err1) => {
+          if (err1) {
+            res.status(400).json("Internal server errors1");
+          } else {
+            const deleteSQL = `DELETE FROM blogs WHERE id= ${id}`;
+            con.query(deleteSQL, (err2) => {
+              if (err2) {
+                console.log(err2);
+                res.status(400).json("Internal server errors2");
+              } else {
+                res.status(200).json("Blog delete successfull!");
+              }
+            });
+          }
+        });
+      }
+    });
+  } else {
+    res.status(400).json({
+      errors: {
+        common: {
+          msg: "Authentication failure!",
+        },
+      },
+    });
+  }
+}
+
 // module exports
-module.exports = { addBlog, getBlogs, getSingleBlog, updateSingleBlog };
+module.exports = {
+  addBlog,
+  getBlogs,
+  getSingleBlog,
+  updateSingleBlog,
+  deleteBlog,
+};

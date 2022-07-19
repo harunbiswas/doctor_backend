@@ -4,7 +4,15 @@ const {
   getBlogs,
   getSingleBlog,
   updateSingleBlog,
+  deleteBlog,
 } = require("../controller/admin/blogs/blogController");
+const {
+  addClinic,
+  getClinics,
+  getSingleClinc,
+  deleteClinics,
+  deleteClinic,
+} = require("../controller/admin/clinic/clinicController");
 
 // internal imports
 const {
@@ -20,6 +28,10 @@ const {
   addBlogValidatorsResust,
 } = require("../middlewares/admin/blog/addBlogValidators");
 const {
+  addClinicValidators,
+  addClinicValidationResult,
+} = require("../middlewares/admin/clinic/addClinicValidators");
+const {
   doLoginValidators,
   doLoginValidatorsResust,
 } = require("../middlewares/admin/login/loginValidator");
@@ -28,7 +40,6 @@ const {
   addUserValidatorsHandler,
 } = require("../middlewares/admin/users/userValidator");
 const { checkLogin } = require("../middlewares/common/checkLogin");
-const singleUploader = require("../utilities/admin/singleUploader");
 
 const router = express.Router();
 
@@ -82,4 +93,30 @@ router.put(
   addBlogValidators,
   updateSingleBlog
 );
+
+// delete blog
+router.delete("/blog/:id", checkLogin, deleteBlog);
+
+// clinic
+// add clinic
+router.post(
+  "/clinic",
+  checkLogin,
+  fileUpload,
+  addClinicValidators,
+  addClinicValidationResult,
+  addClinic
+);
+
+// get clinics
+router.get("/clinics", checkLogin, getClinics);
+
+// get single clinic
+router.get("/clinic/:id", checkLogin, getSingleClinc);
+
+// get single clinic
+router.delete("/clinic/:id", checkLogin, deleteClinic);
+// add doctor
+router.post("/doctor", checkLogin, fileUpload);
+
 module.exports = router;
