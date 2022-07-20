@@ -119,50 +119,21 @@ async function addpatient(req, res, next) {
 
 // get patients
 async function getpatients(req, res, next) {
-  if (req.headers.clinicid) {
-    const sql = `SELECT * FROM users INNER JOIN patients ON patients.userId = users.id  WHERE clinicID = ${JSON.stringify(
-      req.headers.clinicid
-    )}`;
-    con.query(sql, (err, rows) => {
-      if (err) {
-        console.log(err);
-        res.status(400).json("Internal server Errors");
-      } else {
-        res.status(200).json(rows);
-      }
-    });
-  } else {
-    con.query(
-      `SELECT * FROM clinics WHERE userId= ${JSON.stringify(req.user.id)}`,
-      (err, rows) => {
-        if (err) {
-          res.status(500).json("Internal server errors!");
-        } else {
-          if (rows.length > 0) {
-            const sql = `SELECT * FROM users INNER JOIN patients ON patients.userId = users.id WHERE clinicID = ${JSON.stringify(
-              rows[0].id
-            )} `;
-            con.query(sql, (err, rows) => {
-              if (err) {
-                console.log(err);
-                res.status(400).json("Internal server Errors");
-              } else {
-                res.status(200).json(rows);
-              }
-            });
-          } else {
-            res.status(400).json("Clinic not found");
-          }
-        }
-      }
-    );
-  }
+  const sql = `SELECT * , "" as password FROM users INNER JOIN patients ON patients.userId = users.id WHERE users.role = "patient" `;
+  con.query(sql, (err, rows) => {
+    if (err) {
+      console.log(err);
+      res.status(400).json("Internal server Errors");
+    } else {
+      res.status(200).json(rows);
+    }
+  });
 }
 
 //get single patient
 async function getSinglepatient(req, res, next) {
   const { id } = req.params;
-  const sql = `SELECT * FROM users RIGHT JOIN patients ON patients.userId= users.id  WHERE patients.id = ${JSON.stringify(
+  const sql = `SELECT *, "" as password  FROM users RIGHT JOIN patients ON patients.userId= users.id  WHERE patients.id = ${JSON.stringify(
     id
   )}`;
 

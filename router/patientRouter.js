@@ -1,5 +1,9 @@
 const express = require("express");
-const { addpatient } = require("../controller/patient/patientController");
+const {
+  addpatient,
+  getpatients,
+  getSinglepatient,
+} = require("../controller/patient/patientController");
 const fileUpload = require("../helpers/admin/fileUploader");
 const {
   addpatientValidators,
@@ -20,5 +24,7 @@ router.post(
   addpatientValidatorsResults,
   addpatient
 );
+router.get("/list", getpatients);
+router.get("/list/:id", getSinglepatient);
 
 module.exports = router;

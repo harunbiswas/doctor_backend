@@ -115,7 +115,7 @@ async function adddoctor(req, res, next) {
 // get doctors
 async function getdoctors(req, res, next) {
   if (req.headers.clinicid) {
-    const sql = `SELECT * FROM users INNER JOIN doctors ON doctors.userId = users.id  WHERE clinicID = ${JSON.stringify(
+    const sql = `SELECT * , "" as password FROM users INNER JOIN doctors ON doctors.userId = users.id  WHERE clinicID = ${JSON.stringify(
       req.headers.clinicid
     )}`;
     con.query(sql, (err, rows) => {
@@ -134,7 +134,7 @@ async function getdoctors(req, res, next) {
           res.status(500).json("Internal server errors!");
         } else {
           if (rows.length > 0) {
-            const sql = `SELECT * FROM users INNER JOIN doctors ON doctors.userId = users.id WHERE clinicID = ${JSON.stringify(
+            const sql = `SELECT * , "" as password FROM users INNER JOIN doctors ON doctors.userId = users.id WHERE clinicID = ${JSON.stringify(
               rows[0].id
             )} `;
             con.query(sql, (err, rows) => {
@@ -157,7 +157,7 @@ async function getdoctors(req, res, next) {
 //get single doctor
 async function getSingleDoctor(req, res, next) {
   const { id } = req.params;
-  const sql = `SELECT * FROM users RIGHT JOIN doctors ON doctors.userId= users.id  WHERE doctors.id = ${JSON.stringify(
+  const sql = `SELECT *, "" as password FROM users RIGHT JOIN doctors ON doctors.userId= users.id  WHERE doctors.id = ${JSON.stringify(
     id
   )}`;
 
