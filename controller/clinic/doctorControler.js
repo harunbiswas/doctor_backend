@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const con = require("../../database/dbConnection");
+const { unlink } = require("fs");
 
 // inser doctor
 const inserdoctor = (con, data, res, req) => {
@@ -114,7 +115,7 @@ async function adddoctor(req, res, next) {
 // get doctors
 async function getdoctors(req, res, next) {
   if (req.headers.clinicid) {
-    const sql = `SELECT * FROM doctors INNER JOIN users ON users.id = doctors.userId WHERE clinicID = ${JSON.stringify(
+    const sql = `SELECT * FROM users INNER JOIN doctors ON doctors.userId = users.id  WHERE clinicID = ${JSON.stringify(
       req.headers.clinicid
     )}`;
     con.query(sql, (err, rows) => {
@@ -133,7 +134,7 @@ async function getdoctors(req, res, next) {
           res.status(500).json("Internal server errors!");
         } else {
           if (rows.length > 0) {
-            const sql = `SELECT * FROM doctors INNER JOIN users ON users.id = doctors.userId WHERE clinicID = ${JSON.stringify(
+            const sql = `SELECT * FROM users INNER JOIN doctors ON doctors.userId = users.id WHERE clinicID = ${JSON.stringify(
               rows[0].id
             )} `;
             con.query(sql, (err, rows) => {
@@ -154,12 +155,15 @@ async function getdoctors(req, res, next) {
 }
 
 //get single doctor
-async function getSingleClinc(req, res, next) {
+async function getSingleDoctor(req, res, next) {
   const { id } = req.params;
-  const sql = `SELECT * FROM doctors WHERE id = ${id}`;
+  const sql = `SELECT * FROM users RIGHT JOIN doctors ON doctors.userId= users.id  WHERE doctors.id = ${JSON.stringify(
+    id
+  )}`;
 
   con.query(sql, (err, rows) => {
     if (err) {
+      console.log(err);
       res.status(400).json("Internal server Errors");
     } else {
       res.status(200).json(rows[0]);
@@ -170,19 +174,35 @@ async function getSingleClinc(req, res, next) {
 // delete doctor
 
 async function deletedoctor(req, res, next) {
-  if (req.user) {
+  if (req.user && req.user.role === "clinic") {
     const { id } = req.params;
-    const sql = `DELETE FROM doctors WHERE id = ${id}`;
-    con.query(sql, (err) => {
+    con.query(`SELECT * FROM doctors WHERE id = ${id}`, (err, rows) => {
       if (err) {
-        console.log("err");
-        res.status(400).json("Internal server Errors");
+        res.status(500).json("Internal server Errors");
       } else {
-        res.status(200).json("doctor delete successfull!");
+        if (rows.length > 0) {
+          unlink(rows[0].image, (err1) => {
+            if (err1) {
+              res.status(500).json("Internal server Errors");
+            } else {
+              const sql = `DELETE FROM users WHERE id = ${rows[0].userId}`;
+              con.query(sql, (err2) => {
+                if (err2) {
+                  console.log(err2);
+                  res.status(500).json("Internal server Errors");
+                } else {
+                  res.status(200).json("doctor delete successfull!");
+                }
+              });
+            }
+          });
+        } else {
+          res.status(400).json("Doctor not found!");
+        }
       }
     });
   } else {
-    req.status(502).json("Authontication failure!");
+    req.status(502).json("Only clinic can delete doctor!");
   }
 }
-module.exports = { adddoctor, getdoctors };
+module.exports = { adddoctor, getdoctors, getSingleDoctor, deletedoctor };

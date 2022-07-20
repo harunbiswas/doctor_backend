@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const con = require("../../../database/dbConnection");
+const { unlink } = require("fs");
 
 // inser clinic
 const inserClinic = (con, data, res) => {
@@ -122,12 +123,28 @@ async function getSingleClinc(req, res, next) {
 async function deleteClinic(req, res, next) {
   if (req.user) {
     const { id } = req.params;
-    const sql = `DELETE FROM clinics WHERE id = ${id}`;
-    con.query(sql, (err) => {
+    con.query(`SELECT * FROM clinics WHERE id =${id}`, (err, rows) => {
       if (err) {
-        res.status(400).json("Internal server Errors");
+        res.status(500).json("Internal server Errors");
       } else {
-        res.status(200).json("Clinic delete successfull!");
+        if (rows.length > 0) {
+          unlink(rows[0].image, (err) => {
+            if (err) {
+              res.status(500).json("Internal server Errors");
+            } else {
+              const sql = `DELETE FROM users WHERE id = ${rows[0].userId}`;
+              con.query(sql, (err) => {
+                if (err) {
+                  res.status(500).json("Internal server Errors");
+                } else {
+                  res.status(200).json("Clinic delete successfull!");
+                }
+              });
+            }
+          });
+        } else {
+          res.status(400).json("Clinic not found!");
+        }
       }
     });
   } else {
