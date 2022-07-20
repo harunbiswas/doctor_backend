@@ -15,6 +15,7 @@ const adminRouter = require("./router/adminRouter");
 const dashboardRouter = require("./router/dashboardRouter");
 const doctorRouter = require("./router/doctorRouter");
 const clinicRouter = require("./router/clinicRouter");
+const patientRouter = require("./router/patientRouter");
 
 // start project
 const app = express();
@@ -50,6 +51,7 @@ app.use("/admin", adminRouter);
 app.use("/dashboard", dashboardRouter);
 app.use("/doctor", doctorRouter);
 app.use("/clinic", clinicRouter);
+app.use("/patient", patientRouter);
 
 // 404 handler
 app.use(notFoundHandler);
