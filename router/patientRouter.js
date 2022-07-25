@@ -26,5 +26,6 @@ router.post(
 );
 router.get("/list", getpatients);
 router.get("/list/:id", getSinglepatient);
+router.post("/apointment");
 
 module.exports = router;

@@ -177,19 +177,15 @@ async function login(req, res, next) {
           });
         } else {
           res.status(401).json({
-            errors: {
-              common: {
-                msg: "Login faild! Try again.",
-              },
+            password: {
+              msg: "Password incurrect",
             },
           });
         }
       } else {
         res.status(401).json({
-          errors: {
-            common: {
-              msg: "user not found!",
-            },
+          email: {
+            msg: "Email is invalid",
           },
         });
       }
