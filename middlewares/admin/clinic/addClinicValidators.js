@@ -60,17 +60,14 @@ const addClinicValidationResult = function (req, res, next) {
             location: "body",
           };
           if (req.files.length > 0) {
-            const { filename } = req.files[0];
-            unlink(
-              path.join(__dirname, `../../../public/images/photo/${filename}`),
-              (err) => {
-                if (err) {
-                  console.log(err);
-                } else {
-                  res.status(500).json(mappedErrors);
-                }
+            const { path } = req.files[0];
+            unlink(path, (err) => {
+              if (err) {
+                console.log(err);
+              } else {
+                res.status(500).json(mappedErrors);
               }
-            );
+            });
           } else {
             res.status(400).json({
               image: {
