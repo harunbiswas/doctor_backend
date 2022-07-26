@@ -10,10 +10,8 @@ function fileUpload(req, res, next) {
   upload.any()(req, res, (err) => {
     if (err) {
       res.status(500).json({
-        errors: {
-          image: {
-            msg: err.message,
-          },
+        image: {
+          msg: err.message,
         },
       });
     } else {

@@ -83,10 +83,8 @@ async function addClinic(req, res, next) {
     inserClinic(con, data, res);
   } else {
     res.status(500).json({
-      errors: {
-        image: {
-          msg: "Clinic Profile image is require!",
-        },
+      image: {
+        msg: "Clinic Profile image is require!",
       },
     });
   }

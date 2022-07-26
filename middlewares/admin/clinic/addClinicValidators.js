@@ -73,10 +73,8 @@ const addClinicValidationResult = function (req, res, next) {
             );
           } else {
             res.status(400).json({
-              errors: {
-                file: {
-                  msg: "Clinic image is requires",
-                },
+              image: {
+                msg: "Clinic image is requires",
               },
             });
           }
@@ -87,18 +85,14 @@ const addClinicValidationResult = function (req, res, next) {
     });
   } else {
     if (req.files && req.files.length > 0) {
-      const { filename } = req.files[0];
-
-      unlink(
-        path.join(__dirname, `../../../public/images/blog/${filename}`),
-        (err) => {
-          if (err) {
-            res.status(500).json("Internal Server Errors");
-          } else {
-            res.status(400).json(mappedErrors);
-          }
+      const { path } = req.files[0];
+      unlink(path, (err) => {
+        if (err) {
+          res.status(500).json("Internal Server Errors");
+        } else {
+          res.status(400).json(mappedErrors);
         }
-      );
+      });
     } else {
       res.status(400).json(mappedErrors);
     }
