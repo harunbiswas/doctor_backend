@@ -81,7 +81,7 @@ router.post(
 );
 
 // getBlogs
-router.get("/blogs", checkLogin, getBlogs);
+router.get("/blogs", getBlogs);
 
 // get single blog
 router.get("/blog/:id", checkLogin, getSingleBlog);

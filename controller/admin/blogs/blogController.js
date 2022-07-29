@@ -3,11 +3,11 @@ const { unlink } = require("fs");
 
 // inser blog
 const inserBlog = (con, data, res) => {
-  const sql = `INSERT INTO blogs( title, creatorID, description, creatorName, thumbnail, tags) VALUES (${JSON.stringify(
+  const sql = `INSERT INTO blogs( title, creatorID, creatorName, description,  thumbnail) VALUES (${JSON.stringify(
     data.title
-  )},${data.creatorID}, ${JSON.stringify(data.description)}, ${JSON.stringify(
-    data.creatorName
-  )}, ${JSON.stringify(data.thumnel)}, ${JSON.stringify(data.tags)} )`;
+  )},${data.creatorID}, ${JSON.stringify(data.creatorName)}, ${JSON.stringify(
+    data.description
+  )},  ${JSON.stringify(data.thumnel)} )`;
 
   con.query(sql, (err) => {
     if (err) {
@@ -40,13 +40,12 @@ const updateBlog = (con, data, res) => {
 
 // add blog
 async function addBlog(req, res, next) {
-  const { title, description, tags } = req.body;
+  const { title, description } = req.body;
   if (req.user) {
     if (req.files && req.files.length > 0) {
       const data = {
         title,
         description,
-        tags,
         creatorID: req.user.id,
         creatorName: req.user.firstName + " " + req.user.lastName,
         thumnel: req.files[0].path,
@@ -75,24 +74,14 @@ async function addBlog(req, res, next) {
 
 //get blogs
 async function getBlogs(req, res, next) {
-  if (req.user) {
-    const sql = `SELECT * FROM blogs`;
-    con.query(sql, (err, rows) => {
-      if (err) {
-        res.status(500).json("Internal server error");
-      } else {
-        res.status(200).json(rows);
-      }
-    });
-  } else {
-    res.status(400).json({
-      errors: {
-        common: {
-          msg: "Authentication failure!",
-        },
-      },
-    });
-  }
+  const sql = `SELECT * FROM blogs`;
+  con.query(sql, (err, rows) => {
+    if (err) {
+      res.status(500).json("Internal server error");
+    } else {
+      res.status(200).json(rows);
+    }
+  });
 }
 
 // get single blog

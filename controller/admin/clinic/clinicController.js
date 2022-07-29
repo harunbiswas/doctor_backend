@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const con = require("../../../database/dbConnection");
 const { unlink } = require("fs");
+const { json } = require("express");
 
 // inser clinic
 const inserClinic = (con, data, res) => {
@@ -92,7 +93,8 @@ async function addClinic(req, res, next) {
 
 // get clinics
 async function getClinics(req, res, next) {
-  const sql = "SELECT * FROM clinics";
+  const sql =
+    "SELECT *, null as password  FROM users LEFT JOIN clinics ON clinics.userId = users.id WHERE role='clinic '";
   con.query(sql, (err, rows) => {
     if (err) {
       res.status(400).json("Internal server Errors");
@@ -105,13 +107,35 @@ async function getClinics(req, res, next) {
 //get single clinic
 async function getSingleClinc(req, res, next) {
   const { id } = req.params;
-  const sql = `SELECT * FROM clinics WHERE id = ${id}`;
+  const sql = ` SELECT *, null as password FROM users LEFT JOIN clinics ON clinics.userId = users.id WHERE users.id = ${JSON.stringify(
+    id
+  )}`;
 
   con.query(sql, (err, rows) => {
     if (err) {
-      res.status(400).json("Internal server Errors");
+      res.status(500).json("Internal server Errors");
     } else {
-      res.status(200).json(rows[0]);
+      con.query(
+        `SELECT * FROM departments WHERE clinicId = ${rows[0].id}`,
+        (err1, data) => {
+          if (err1) {
+            res.status(500).json("Internal server Errors");
+          } else {
+            rows[0].departments = data;
+            con.query(
+              `SELECT * FROM doctors RIGHT JOIN users ON users.id = doctors.userId JOIN departments ON departments.id = doctors.departmentId  WHERE doctors.clinicId = ${rows[0].id}`,
+              (err2, rows1) => {
+                if (err2) {
+                  res.status(500).json("Internal server Errors");
+                } else {
+                  rows[0].doctors = rows1;
+                  res.status(200).json(rows[0]);
+                }
+              }
+            );
+          }
+        }
+      );
     }
   });
 }

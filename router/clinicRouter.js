@@ -1,5 +1,9 @@
 const express = require("express");
-const { addClinic } = require("../controller/admin/clinic/clinicController");
+const {
+  addClinic,
+  getClinics,
+  getSingleClinc,
+} = require("../controller/admin/clinic/clinicController");
 const {
   login,
 } = require("../controller/admin/loginSignup/loginSingupController");
@@ -38,9 +42,8 @@ const { checkLogin } = require("../middlewares/common/checkLogin");
 const router = express.Router();
 
 // clinic page
-router.get("/", (req, res, next) => {
-  res.json("clinic pages");
-});
+router.get("/", getClinics);
+router.get("/:id", getSingleClinc);
 
 // create clinic account
 router.post(

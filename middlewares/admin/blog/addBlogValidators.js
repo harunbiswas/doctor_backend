@@ -11,7 +11,6 @@ const addBlogValidators = [
     .isLength({ min: 100 })
     .withMessage("Description should be minimum 100 caractors")
     .trim(),
-  check("tags").isLength({ min: 1 }).withMessage("Tags is required"),
 ];
 
 const addBlogValidatorsResust = (req, res, next) => {
