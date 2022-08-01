@@ -12,7 +12,11 @@ const addDepertment = async function (req, res, next) {
           res.status(500).json("Internal server error!");
         } else {
           if (rows.length > 0) {
-            res.status(400).json("The department already added!");
+            res.status(400).json({
+              title: {
+                msg: "The department already added!",
+              },
+            });
           } else {
             const sql = `INSERT INTO departments(title, clinicID, discription) VALUES(${JSON.stringify(
               req.body.title

@@ -83,10 +83,8 @@ const addDoctorValidatorsResults = async function (req, res, next) {
             });
           } else {
             res.status(400).json({
-              errors: {
-                file: {
-                  msg: "Clinic image is requires",
-                },
+              image: {
+                msg: "Clinic image is requires",
               },
             });
           }

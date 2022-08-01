@@ -115,9 +115,10 @@ async function adddoctor(req, res, next) {
 // get doctors
 async function getdoctors(req, res, next) {
   if (req.headers.clinicid) {
-    const sql = `SELECT * , "" as password FROM users INNER JOIN doctors ON doctors.userId = users.id  WHERE clinicID = ${JSON.stringify(
+    const sql = `SELECT * , "" as password FROM users LEFT JOIN doctors ON doctors.userId = users.id LEFT JOIN departments ON departments.id = doctors.departmentId  WHERE doctors.clinicID = ${JSON.stringify(
       req.headers.clinicid
     )}`;
+
     con.query(sql, (err, rows) => {
       if (err) {
         console.log(err);
@@ -134,7 +135,7 @@ async function getdoctors(req, res, next) {
           res.status(500).json("Internal server errors!");
         } else {
           if (rows.length > 0) {
-            const sql = `SELECT * , "" as password FROM users INNER JOIN doctors ON doctors.userId = users.id WHERE clinicID = ${JSON.stringify(
+            const sql = `SELECT * , "" as password FROM users LEFT JOIN doctors ON doctors.userId = users.id RIGHT JOIN departments ON departments.id = doctors.departmentId WHERE doctors.clinicID = ${JSON.stringify(
               rows[0].id
             )} `;
             con.query(sql, (err, rows) => {
@@ -157,16 +158,21 @@ async function getdoctors(req, res, next) {
 //get single doctor
 async function getSingleDoctor(req, res, next) {
   const { id } = req.params;
-  const sql = `SELECT *, "" as password FROM users RIGHT JOIN doctors ON doctors.userId= users.id  WHERE doctors.id = ${JSON.stringify(
+  const sql = `SELECT *, "" as password FROM users RIGHT JOIN doctors ON doctors.userId= users.id JOIN departments ON departments.id = doctors.departmentId  WHERE users.id = ${JSON.stringify(
     id
   )}`;
+  console.log(id);
 
   con.query(sql, (err, rows) => {
     if (err) {
       console.log(err);
       res.status(400).json("Internal server Errors");
     } else {
-      res.status(200).json(rows[0]);
+      if (rows.length > 0) {
+        res.status(200).json(rows[0]);
+      } else {
+        res.status(200).json("Doctor data not found");
+      }
     }
   });
 }

@@ -43,7 +43,7 @@ const router = express.Router();
 
 // clinic page
 router.get("/", getClinics);
-router.get("/:id", getSingleClinc);
+router.get("/list/:id", getSingleClinc);
 
 // create clinic account
 router.post(
@@ -78,7 +78,7 @@ router.post(
   adddoctor
 );
 router.get("/doctors", checkLogin, getdoctors);
-router.get("/doctor/:id", checkLogin, getSingleDoctor);
+router.get("/doctor/:id", getSingleDoctor);
 router.delete("/doctor/:id", checkLogin, deletedoctor);
 
 module.exports = router;

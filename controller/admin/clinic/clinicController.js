@@ -115,27 +115,33 @@ async function getSingleClinc(req, res, next) {
     if (err) {
       res.status(500).json("Internal server Errors");
     } else {
-      con.query(
-        `SELECT * FROM departments WHERE clinicId = ${rows[0].id}`,
-        (err1, data) => {
-          if (err1) {
-            res.status(500).json("Internal server Errors");
-          } else {
-            rows[0].departments = data;
-            con.query(
-              `SELECT * FROM doctors RIGHT JOIN users ON users.id = doctors.userId JOIN departments ON departments.id = doctors.departmentId  WHERE doctors.clinicId = ${rows[0].id}`,
-              (err2, rows1) => {
-                if (err2) {
-                  res.status(500).json("Internal server Errors");
-                } else {
-                  rows[0].doctors = rows1;
-                  res.status(200).json(rows[0]);
+      if (rows && rows.length > 0) {
+        con.query(
+          `SELECT * FROM departments WHERE clinicId = ${
+            rows.length > 0 && rows[0].id
+          }`,
+          (err1, data) => {
+            if (err1) {
+              res.status(500).json("Internal server Errors");
+            } else {
+              rows[0].departments = data;
+              con.query(
+                `SELECT * FROM doctors RIGHT JOIN users ON users.id = doctors.userId JOIN departments ON departments.id = doctors.departmentId  WHERE doctors.clinicId = ${rows[0].id}`,
+                (err2, rows1) => {
+                  if (err2) {
+                    res.status(500).json("Internal server Errors");
+                  } else {
+                    rows[0].doctors = rows1;
+                    res.status(200).json(rows[0]);
+                  }
                 }
-              }
-            );
+              );
+            }
           }
-        }
-      );
+        );
+      } else {
+        res.status(200).json("data not found!");
+      }
     }
   });
 }
