@@ -140,7 +140,6 @@ async function getdoctors(req, res, next) {
             )} `;
             con.query(sql, (err, rows) => {
               if (err) {
-                console.log(err);
                 res.status(400).json("Internal server Errors");
               } else {
                 res.status(200).json(rows);
@@ -161,11 +160,9 @@ async function getSingleDoctor(req, res, next) {
   const sql = `SELECT *, "" as password FROM users RIGHT JOIN doctors ON doctors.userId= users.id JOIN departments ON departments.id = doctors.departmentId  WHERE users.id = ${JSON.stringify(
     id
   )}`;
-  console.log(id);
 
   con.query(sql, (err, rows) => {
     if (err) {
-      console.log(err);
       res.status(400).json("Internal server Errors");
     } else {
       if (rows.length > 0) {
