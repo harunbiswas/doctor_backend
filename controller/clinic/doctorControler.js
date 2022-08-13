@@ -1,6 +1,8 @@
 const bcrypt = require("bcrypt");
 const con = require("../../database/dbConnection");
 const { unlink } = require("fs");
+const { json } = require("express");
+const { body } = require("express-validator");
 
 // inser doctor
 const inserdoctor = (con, data, res, req) => {
@@ -62,26 +64,6 @@ const inserdoctor = (con, data, res, req) => {
   });
 };
 
-// update doctor query
-const updatedoctor = (con, data, res) => {
-  const sql = `UPDATE blogs SET departmentID=null,thumbnail = ${JSON.stringify(
-    data.thumnel
-  )},title=${JSON.stringify(
-    data.title
-  )},date=null,timeToRead=null,description=${JSON.stringify(
-    data.description
-  )},tags=${JSON.stringify(data.tags)} WHERE id = ${data.id}`;
-
-  con.query(sql, (err) => {
-    if (err) {
-      // console.log(err);
-      res.status(400).json("Internal server errors!");
-    } else {
-      res.status(200).json("Blog update successfull");
-    }
-  });
-};
-
 // add doctor
 async function adddoctor(req, res, next) {
   const { firstName, lastName, phone, email, password, departmentID, gender } =
@@ -103,10 +85,8 @@ async function adddoctor(req, res, next) {
     inserdoctor(con, data, res, req);
   } else {
     res.status(500).json({
-      errors: {
-        image: {
-          msg: "doctor Profile image is require!",
-        },
+      image: {
+        msg: "doctor Profile image is require!",
       },
     });
   }
@@ -179,33 +159,109 @@ async function getSingleDoctor(req, res, next) {
 async function deletedoctor(req, res, next) {
   if (req.user && req.user.role === "clinic") {
     const { id } = req.params;
-    con.query(`SELECT * FROM doctors WHERE id = ${id}`, (err, rows) => {
-      if (err) {
-        res.status(500).json("Internal server Errors");
-      } else {
-        if (rows.length > 0) {
-          unlink(rows[0].image, (err1) => {
-            if (err1) {
-              res.status(500).json("Internal server Errors");
-            } else {
-              const sql = `DELETE FROM users WHERE id = ${rows[0].userId}`;
-              con.query(sql, (err2) => {
-                if (err2) {
-                  console.log(err2);
-                  res.status(500).json("Internal server Errors");
-                } else {
-                  res.status(200).json("doctor delete successfull!");
-                }
-              });
-            }
-          });
+    con.query(
+      `SELECT * FROM users LEFT JOIN doctors ON doctors.userId = users.id WHERE users.id = ${id}`,
+      (err, rows) => {
+        if (err) {
+          res.status(500).json("Internal server Errors!");
         } else {
-          res.status(400).json("Doctor not found!");
+          if (rows.length > 0) {
+            unlink(rows[0].image, (err1) => {
+              if (err1) {
+                res.status(500).json("Internal server Error");
+              } else {
+                const sql = `DELETE FROM users WHERE id = ${id}`;
+                con.query(sql, (err2) => {
+                  if (err2) {
+                    console.log(err2);
+                    res.status(500).json("Internal server Errors!");
+                  } else {
+                    console.log(err2);
+                    res.status(200).json("Doctor delete successfull!");
+                  }
+                });
+              }
+            });
+          } else {
+            res.status(400).json("Doctor not found!");
+          }
         }
       }
-    });
+    );
   } else {
     req.status(502).json("Only clinic can delete doctor!");
   }
 }
-module.exports = { adddoctor, getdoctors, getSingleDoctor, deletedoctor };
+
+async function updateDoctor(req, res, next) {
+  const { id } = req.params;
+
+  if ((req.user && req.user.role === "doctor") || req.user.role === "clinic") {
+    con.query(
+      `SELECT * FROM users LEFT JOIN doctors ON doctors.userId = users.id WHERE users.id = ${JSON.stringify(
+        id
+      )}`,
+      (err, rows) => {
+        if (err) {
+          res.status(500).json("Internal server errors!");
+        } else {
+          if (rows.length > 0) {
+            const sql = `UPDATE users SET firstName = ${JSON.stringify(
+              req.body.firstName || rows[0].firstName
+            )}, lastName=${JSON.stringify(
+              req.body.lastName || rows[0].lastName
+            )} WHERE id=  ${id}`;
+            con.query(sql, (err1) => {
+              if (err1) {
+                res.status(500).json("Internal server errors!");
+              } else {
+                const sql1 = `UPDATE doctors SET  image=${JSON.stringify(
+                  req.body.image || rows[0].image
+                )}, degree=${JSON.stringify(
+                  req.body.degree || rows[0].degree
+                )}, phone=${JSON.stringify(
+                  req.body.phone || rows[0].phone
+                )}, departmentId=${JSON.stringify(
+                  req.body.departmentId || rows[0].departmentId
+                )}, gender=${JSON.stringify(
+                  req.body.gender || rows[0].gender
+                )}, bio=${JSON.stringify(
+                  req.body.bio || rows[0].bio
+                )}, fee=${JSON.stringify(
+                  req.body.fee || rows[0].fee
+                )}, instagram=${JSON.stringify(
+                  req.body.instagram || rows[0].instagram
+                )},linkedin=${JSON.stringify(
+                  req.body.linkedin || rows[0].linkedin
+                )}, facebook=${JSON.stringify(
+                  req.body.facebook || rows[0].facebook
+                )}, twitter=${JSON.stringify(
+                  req.body.twitter || rows[0].twitter
+                )} WHERE id= ${JSON.stringify(rows[0].id)}`;
+
+                con.query(sql1, (err2) => {
+                  if (err2) {
+                    res.status(500).json("Internal server errors");
+                  } else {
+                    res.status(200).json("Profile update successfull!");
+                  }
+                });
+              }
+            });
+          } else {
+            res.status(400).json("Doctor not found!");
+          }
+        }
+      }
+    );
+  } else {
+    res.status(401).json("Authontication failured");
+  }
+}
+module.exports = {
+  adddoctor,
+  getdoctors,
+  getSingleDoctor,
+  deletedoctor,
+  updateDoctor,
+};

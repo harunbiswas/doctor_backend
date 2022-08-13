@@ -20,6 +20,10 @@ const addAppointmentValidator = [
     .withMessage("Invalid phone number")
     .trim(),
   check("age").isLength({ min: 1 }).withMessage("Age is required").trim(),
+  check("clinicId")
+    .isLength({ min: 1 })
+    .withMessage("Clinic is required")
+    .trim(),
 ];
 
 const addAppointmentResult = function (req, res, next) {

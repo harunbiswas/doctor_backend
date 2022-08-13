@@ -1,6 +1,7 @@
 const express = require("express");
 const {
   addAppointment,
+  getAppointments,
 } = require("../controller/appointment/appointmentController");
 const {
   addAppointmentResult,
@@ -9,6 +10,7 @@ const {
 const {
   appointmentCheckLogin,
 } = require("../middlewares/appointment/appintmentCheckLogin");
+const { checkLogin } = require("../middlewares/common/checkLogin");
 const {
   addpatientValidators,
 } = require("../middlewares/patients/addPatientValidators");
@@ -24,10 +26,11 @@ router.get("/", (req, res, next) => {
 router.post(
   "/",
   appointmentCheckLogin,
-
   addAppointmentValidator,
   addAppointmentResult,
   addAppointment
 );
+
+router.get("/list", checkLogin, getAppointments);
 
 module.exports = router;

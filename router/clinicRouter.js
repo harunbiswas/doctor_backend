@@ -18,6 +18,7 @@ const {
   getdoctors,
   getSingleDoctor,
   deletedoctor,
+  updateDoctor,
 } = require("../controller/clinic/doctorControler");
 const fileUpload = require("../helpers/admin/fileUploader");
 
@@ -80,5 +81,6 @@ router.post(
 router.get("/doctors", checkLogin, getdoctors);
 router.get("/doctor/:id", getSingleDoctor);
 router.delete("/doctor/:id", checkLogin, deletedoctor);
+router.put("/doctor/:id", checkLogin, updateDoctor);
 
 module.exports = router;
