@@ -66,7 +66,7 @@ router.post(
   addDepertmentValidatorsResult,
   addDepertment
 );
-router.get("/departments", checkLogin, getDepartment);
+router.get("/departments", getDepartment);
 router.delete("/department/:id", checkLogin, deleteDepartment);
 
 // doctors

@@ -1,4 +1,10 @@
 const express = require("express");
+const {
+  getDepartmentFrontend,
+} = require("../controller/frontend/frontendDepartmentController");
+const {
+  getfrontendDoctors,
+} = require("../controller/frontend/frontendDoctorController");
 
 const router = express.Router();
 
@@ -8,5 +14,11 @@ router.get("/", (req, res, next) => {
 });
 
 router.post("/singin");
+
+// get departments
+router.get("/departments", getDepartmentFrontend);
+
+// get doctors for appointments
+router.get("/doctors", getfrontendDoctors);
 
 module.exports = router;
