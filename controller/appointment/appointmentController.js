@@ -4,13 +4,13 @@ const { get } = require("../../router/appointmentRouter");
 
 // inser appointment
 const inserAppintment = (con, res, data) => {
-  const sql = `INSERT INTO appointments(patientId, doctorId, departmentId, name, email, time, date, phone, comments, age, clinicId) VALUES(${JSON.stringify(
+  const sql = `INSERT INTO appointments(patientId, doctorId, departmentId, name, email, date, phone, comments, age, clinicId) VALUES(${JSON.stringify(
     data.patientId
   )}, ${JSON.stringify(data.doctorId)},${JSON.stringify(
     data.departmentId
   )},${JSON.stringify(data.name)},${JSON.stringify(
     data.email
-  )},${JSON.stringify(data.time)},${JSON.stringify(data.date)},${JSON.stringify(
+  )},${JSON.stringify(data.date)},${JSON.stringify(
     data.phone
   )},${JSON.stringify(data.comments)}, ${JSON.stringify(
     data.age
@@ -35,7 +35,6 @@ const addAppointment = function (req, res, next) {
     departmentId,
     name,
     email,
-    time,
     phone,
     comments,
     age,
@@ -47,7 +46,6 @@ const addAppointment = function (req, res, next) {
     departmentId,
     name,
     email,
-    time,
     phone,
     date,
     comments: comments || null,
@@ -67,7 +65,7 @@ const addAppointment = function (req, res, next) {
             )}`,
             (err, rows) => {
               if (err) {
-                res.status(500).json("Internal server errors");
+                res.status(500).json("Internal server errors!");
               } else {
                 if (rows.length > 0) {
                   con.query(
@@ -81,7 +79,7 @@ const addAppointment = function (req, res, next) {
                         if (rows1.length > 0) {
                           inserAppintment(con, res, data);
                         } else {
-                          res.status(200).json("Doctor not found!");
+                          res.status(400).json("Doctor not found!");
                         }
                       }
                     }

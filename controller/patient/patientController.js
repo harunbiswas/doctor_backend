@@ -20,15 +20,15 @@ const inserpatient = (con, data, res, req) => {
           if (err2) {
             res.status(500).json("Internal server errors!");
           } else {
-            const sql2 = `INSERT INTO patients( userId, phone, image, gender, height, weight, bloodGroup, address) VALUES (${JSON.stringify(
+            const sql2 = `INSERT INTO patients( userId, phone, image, gender, height, weight, bloodGroup, address, age) VALUES (${JSON.stringify(
               rows[0].id
             )}, ${JSON.stringify(data.phone)}, ${JSON.stringify(
               data.image
             )}, ${JSON.stringify(data.gender)}, ${JSON.stringify(
-              data.heigth
-            )}, ${JSON.stringify(data.weigth)}, ${JSON.stringify(
+              data.height
+            )}, ${JSON.stringify(data.weight)}, ${JSON.stringify(
               data.bloadGroup
-            )},  ${JSON.stringify(data.address)})`;
+            )},  ${JSON.stringify(data.address)},${JSON.stringify(data.age)})`;
 
             con.query(sql2, (err3) => {
               if (err3) {
@@ -83,10 +83,11 @@ async function addpatient(req, res, next) {
     email,
     password,
     gender,
-    heigth,
-    weigth,
+    height,
+    weight,
     bloadGroup,
     address,
+    age,
   } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -99,19 +100,18 @@ async function addpatient(req, res, next) {
       password: hashedPassword,
       gender,
       image: req.files[0].path,
-      heigth,
-      weigth,
+      height,
+      weight,
       bloadGroup,
       address,
+      age,
     };
 
     inserpatient(con, data, res, req);
   } else {
     res.status(500).json({
-      errors: {
-        image: {
-          msg: "patient Profile image is require!",
-        },
+      image: {
+        msg: "patient Profile image is require!",
       },
     });
   }
@@ -133,7 +133,7 @@ async function getpatients(req, res, next) {
 //get single patient
 async function getSinglepatient(req, res, next) {
   const { id } = req.params;
-  const sql = `SELECT *, "" as password  FROM users RIGHT JOIN patients ON patients.userId= users.id  WHERE patients.id = ${JSON.stringify(
+  const sql = `SELECT *, "" as password  FROM users RIGHT JOIN patients ON patients.userId= users.id  WHERE users.id = ${JSON.stringify(
     id
   )}`;
 

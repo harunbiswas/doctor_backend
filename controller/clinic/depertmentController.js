@@ -18,18 +18,31 @@ const addDepertment = async function (req, res, next) {
               },
             });
           } else {
-            const sql = `INSERT INTO departments(title, clinicID, discription) VALUES(${JSON.stringify(
-              req.body.title
-            )}, ${JSON.stringify(
-              JSON.stringify(req.user.id)
-            )}, ${JSON.stringify(req.body.description)})`;
-            con.query(sql, (err1) => {
-              if (err1) {
-                res.status(500).json("Internal server error!");
-              } else {
-                res.status(200).json("Department added successfully!");
+            con.query(
+              `SELECT * FROM clinics WHERE userId=${req.user.id}`,
+              (err3, rows1) => {
+                if (err3) {
+                  res.status(500).json("Internal server errors!");
+                } else {
+                  if (rows1.length > 0) {
+                    const sql = `INSERT INTO departments(title, clinicID, discription) VALUES(${JSON.stringify(
+                      req.body.title
+                    )}, ${JSON.stringify(
+                      JSON.stringify(rows1[0].id)
+                    )}, ${JSON.stringify(req.body.description)})`;
+                    con.query(sql, (err1) => {
+                      if (err1) {
+                        res.status(500).json("Internal server error!");
+                      } else {
+                        res.status(200).json("Department added successfully!");
+                      }
+                    });
+                  } else {
+                    res.status(400).json("Clinic not found");
+                  }
+                }
               }
-            });
+            );
           }
         }
       }
@@ -41,17 +54,30 @@ const addDepertment = async function (req, res, next) {
 
 // get department
 const getDepartment = async function (req, res, next) {
-  const sql = `SELECT * FROM departments WHERE clinicID = ${
-    JSON.stringify(req.headers.id) || JSON.stringify(req.user.id)
-  }`;
+  con.query(
+    `SELECT * FROM clinics WHERE userId=${req.user.id}`,
+    (err3, rows1) => {
+      if (err3) {
+        res.status(500).json("Internal server errors!");
+      } else {
+        if (rows1.length > 0) {
+          const sql = `SELECT * FROM departments WHERE clinicID = ${
+            JSON.stringify(req.headers.id) || JSON.stringify(rows1[0].id)
+          }`;
 
-  con.query(sql, (err, rows) => {
-    if (err) {
-      res.status(500).json("Internal server errors");
-    } else {
-      res.status(200).json(rows);
+          con.query(sql, (err, rows) => {
+            if (err) {
+              res.status(500).json("Internal server errors");
+            } else {
+              res.status(200).json(rows);
+            }
+          });
+        } else {
+          res.status(400).json("Clinic not found");
+        }
+      }
     }
-  });
+  );
 };
 
 // delete department

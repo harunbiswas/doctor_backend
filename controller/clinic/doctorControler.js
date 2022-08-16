@@ -157,7 +157,11 @@ async function getSingleDoctor(req, res, next) {
 // delete doctor
 
 async function deletedoctor(req, res, next) {
-  if (req.user && req.user.role === "clinic") {
+  if (
+    (req.user && req.user.role === "clinic") ||
+    req.user.role === "admin" ||
+    req.user.role === "editor"
+  ) {
     const { id } = req.params;
     con.query(
       `SELECT * FROM users LEFT JOIN doctors ON doctors.userId = users.id WHERE users.id = ${id}`,
@@ -166,7 +170,7 @@ async function deletedoctor(req, res, next) {
           res.status(500).json("Internal server Errors!");
         } else {
           if (rows.length > 0) {
-            unlink(rows[0].image, (err1) => {
+            unlink(JSON.stringify(rows[0].image), (err1) => {
               if (err1) {
                 res.status(500).json("Internal server Error");
               } else {
@@ -189,7 +193,7 @@ async function deletedoctor(req, res, next) {
       }
     );
   } else {
-    req.status(502).json("Only clinic can delete doctor!");
+    res.status(502).json("Only admin, editor, clinic can delete doctor!");
   }
 }
 

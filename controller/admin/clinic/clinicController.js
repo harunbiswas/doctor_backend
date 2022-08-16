@@ -107,7 +107,7 @@ async function getClinics(req, res, next) {
 //get single clinic
 async function getSingleClinc(req, res, next) {
   const { id } = req.params;
-  const sql = ` SELECT *, null as password FROM users LEFT JOIN clinics ON clinics.userId = users.id WHERE users.id = ${JSON.stringify(
+  const sql = ` SELECT *, null as password FROM users RIGHT JOIN clinics ON clinics.userId = users.id WHERE users.id = ${JSON.stringify(
     id
   )}`;
 

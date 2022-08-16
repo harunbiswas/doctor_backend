@@ -29,8 +29,8 @@ const addpatientValidators = [
     .isLength({ min: 6 })
     .withMessage("Password should be morethan 6")
     .trim(),
-  check("heigth").isLength({ min: 1 }).withMessage("Height is require!").trim(),
-  check("weigth").isLength({ min: 1 }).withMessage("weight is require!").trim(),
+  check("height").isLength({ min: 1 }).withMessage("Height is require!").trim(),
+  check("weight").isLength({ min: 1 }).withMessage("weight is require!").trim(),
   check("bloadGroup")
     .isLength({ min: 1 })
     .withMessage("BladGroup is require!")
@@ -39,6 +39,7 @@ const addpatientValidators = [
     .isLength({ min: 1 })
     .withMessage("Address is require!")
     .trim(),
+  check("age").isLength({ min: 1 }).withMessage("age is require!").trim(),
 ];
 
 const addpatientValidatorsResults = async function (req, res, next) {
@@ -82,17 +83,15 @@ const addpatientValidatorsResults = async function (req, res, next) {
             unlink(path, (err) => {
               if (err) {
                 console.log(err);
-                res.status(500).json("Internal server error");
+                res.status(500).json("Internal server error!");
               } else {
                 res.status(500).json(mappedErrors);
               }
             });
           } else {
             res.status(400).json({
-              errors: {
-                file: {
-                  msg: "Profile image is requires",
-                },
+              image: {
+                msg: "Profile image is requires",
               },
             });
           }

@@ -11,7 +11,6 @@ const addAppointmentValidator = [
     .trim(),
   check("name").isLength({ min: 1 }).withMessage("Name is required").trim(),
   check("email").isLength({ min: 1 }).withMessage("Email is required").trim(),
-  check("time").isLength({ min: 1 }).withMessage("Time is required").trim(),
   check("date").isLength({ min: 1 }).withMessage("Date is required").trim(),
   check("phone")
     .isLength({ min: 1 })
