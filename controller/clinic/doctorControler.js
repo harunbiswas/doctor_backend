@@ -137,12 +137,11 @@ async function getdoctors(req, res, next) {
 //get single doctor
 async function getSingleDoctor(req, res, next) {
   const { id } = req.params;
-  const sql = `SELECT *, "" as password FROM users RIGHT JOIN doctors ON doctors.userId= users.id JOIN departments ON departments.id = doctors.departmentId  WHERE users.id = ${JSON.stringify(
-    id
-  )}`;
+  const sql = `SELECT *, "" as password FROM users RIGHT JOIN doctors ON doctors.userId= users.id JOIN departments ON departments.id = doctors.departmentId  WHERE users.id = ${id}`;
 
   con.query(sql, (err, rows) => {
     if (err) {
+      console.log(err);
       res.status(400).json("Internal server Errors");
     } else {
       if (rows.length > 0) {
@@ -167,11 +166,13 @@ async function deletedoctor(req, res, next) {
       `SELECT * FROM users LEFT JOIN doctors ON doctors.userId = users.id WHERE users.id = ${id}`,
       (err, rows) => {
         if (err) {
+          console.log(err);
           res.status(500).json("Internal server Errors!");
         } else {
           if (rows.length > 0) {
             unlink(JSON.stringify(rows[0].image), (err1) => {
               if (err1) {
+                console.log(err1);
                 res.status(500).json("Internal server Error");
               } else {
                 const sql = `DELETE FROM users WHERE id = ${id}`;
@@ -202,9 +203,7 @@ async function updateDoctor(req, res, next) {
 
   if ((req.user && req.user.role === "doctor") || req.user.role === "clinic") {
     con.query(
-      `SELECT * FROM users LEFT JOIN doctors ON doctors.userId = users.id WHERE users.id = ${JSON.stringify(
-        id
-      )}`,
+      `SELECT * FROM users LEFT JOIN doctors ON doctors.userId = users.id WHERE users.id = ${id}`,
       (err, rows) => {
         if (err) {
           res.status(500).json("Internal server errors!");
@@ -253,6 +252,7 @@ async function updateDoctor(req, res, next) {
               }
             });
           } else {
+            console.log(rows);
             res.status(400).json("Doctor not found!");
           }
         }
