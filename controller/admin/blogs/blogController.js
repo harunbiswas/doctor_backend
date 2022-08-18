@@ -87,24 +87,15 @@ async function getBlogs(req, res, next) {
 // get single blog
 async function getSingleBlog(req, res, next) {
   const id = req.params.id;
-  if (req.user) {
-    const sql = `SELECT * FROM blogs WHERE id= ${id}`;
-    con.query(sql, (err, rows) => {
-      if (err) {
-        res.status(500).json("Internal server error");
-      } else {
-        res.status(200).json(rows[0]);
-      }
-    });
-  } else {
-    res.status(400).json({
-      errors: {
-        common: {
-          msg: "Authentication failure!",
-        },
-      },
-    });
-  }
+
+  const sql = `SELECT * FROM blogs WHERE id= ${id}`;
+  con.query(sql, (err, rows) => {
+    if (err) {
+      res.status(500).json("Internal server error");
+    } else {
+      res.status(200).json(rows[0]);
+    }
+  });
 }
 
 // update blog

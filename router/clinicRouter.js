@@ -1,5 +1,8 @@
 const express = require("express");
 const {
+  getClinicAppointments,
+} = require("../controller/admin/appointment/appointmentController");
+const {
   addClinic,
   getClinics,
   getSingleClinc,
@@ -82,5 +85,8 @@ router.get("/doctors", checkLogin, getdoctors);
 router.get("/doctor/:id", getSingleDoctor);
 router.delete("/doctor/:id", checkLogin, deletedoctor);
 router.put("/doctor/:id", checkLogin, updateDoctor);
+
+// appointment
+router.get("/appointments", getClinicAppointments);
 
 module.exports = router;

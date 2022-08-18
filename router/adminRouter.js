@@ -1,5 +1,8 @@
 const express = require("express");
 const {
+  getAdminAppointments,
+} = require("../controller/admin/appointment/appointmentController");
+const {
   addBlog,
   getBlogs,
   getSingleBlog,
@@ -84,7 +87,7 @@ router.post(
 router.get("/blogs", getBlogs);
 
 // get single blog
-router.get("/blog/:id", checkLogin, getSingleBlog);
+router.get("/blog/:id", getSingleBlog);
 // update blog
 router.put(
   "/blog/:id",
@@ -118,5 +121,8 @@ router.get("/clinic/:id", checkLogin, getSingleClinc);
 router.delete("/clinic/:id", checkLogin, deleteClinic);
 // add doctor
 router.post("/doctor", checkLogin, fileUpload);
+
+// get appointments
+router.get("/appointments", getAdminAppointments);
 
 module.exports = router;
