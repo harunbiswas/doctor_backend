@@ -34,7 +34,7 @@ const insartFunc = (con, data, res) => {
 async function singupController(req, res, next) {
   const { firstName, lastName, email, password, role } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
-  const selectSQL = `SELECT * FROM users`;
+  const selectSQL = `SELECT * FROM users WHERE role = "admin"`;
 
   con.query(selectSQL, (err, rows) => {
     if (err) {

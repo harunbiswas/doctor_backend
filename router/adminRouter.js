@@ -1,4 +1,5 @@
 const express = require("express");
+const { isAdminCheck } = require("../controller/admin/adminController");
 const {
   getAdminAppointments,
 } = require("../controller/admin/appointment/appointmentController");
@@ -124,5 +125,8 @@ router.post("/doctor", checkLogin, fileUpload);
 
 // get appointments
 router.get("/appointments", getAdminAppointments);
+
+// check is admin
+router.get("/isAdminCheck", isAdminCheck);
 
 module.exports = router;
