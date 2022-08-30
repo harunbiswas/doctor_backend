@@ -28,11 +28,17 @@ dotenv.config();
 
 //database connection
 
-con.connect((error) => {
-  if (!error) {
-    console.log("Database Connectios Success");
+con.on("error", (err) => {
+  if (err.code === "PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR") {
+    con.connect((error) => {
+      if (!error) {
+        console.log("Database Connectios Success");
+      } else {
+        console.log("Database connection failed!");
+      }
+    });
   } else {
-    console.log("Database connection failed!");
+    throw err;
   }
 });
 
