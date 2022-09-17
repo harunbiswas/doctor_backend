@@ -1,7 +1,6 @@
 const { check, validationResult } = require("express-validator");
 const con = require("../../database/dbConnection");
 const { unlink } = require("fs");
-const path = require("path");
 
 const addDoctorValidators = [
   check("firstName")
@@ -38,14 +37,14 @@ const addDoctorValidators = [
 const addDoctorValidatorsResults = async function (req, res, next) {
   const errors = validationResult(req);
   const mappedErrors = errors.mapped();
-
   if (Object.keys(mappedErrors).length > 0) {
     if (req.files && req.files.length > 0) {
-      const { path, destination, filename } = req.files[0];
+      const { destination, filename } = req.files[0];
+
       unlink(destination + filename, (err) => {
         if (err) {
           console.log(err);
-          res.status(500).json("Internal Server Errors");
+          res.status(500).json("Internal Server Errors!");
         } else {
           res.status(400).json(mappedErrors);
         }
@@ -61,7 +60,7 @@ const addDoctorValidatorsResults = async function (req, res, next) {
     con.query(sql, (err, rows) => {
       if (err) {
         console.log(err);
-        res.status(500).json("Internal server errors");
+        res.status(500).json("Internal server errors!");
       } else {
         if (rows && rows.length > 0) {
           mappedErrors.email = {
@@ -76,7 +75,7 @@ const addDoctorValidatorsResults = async function (req, res, next) {
             unlink(path, (err) => {
               if (err) {
                 console.log(err);
-                res.status(500).json("Internal server error");
+                res.status(500).json("Internal server error!");
               } else {
                 res.status(500).json(mappedErrors);
               }

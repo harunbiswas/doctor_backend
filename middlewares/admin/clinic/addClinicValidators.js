@@ -60,8 +60,9 @@ const addClinicValidationResult = function (req, res, next) {
             location: "body",
           };
           if (req.files.length > 0) {
-            const { path } = req.files[0];
-            unlink(path, (err) => {
+            const { path, destination, filename } = req.files[0];
+            console.log(destination, filename);
+            unlink(destination + filename, (err) => {
               if (err) {
                 console.log(err);
               } else {
@@ -82,10 +83,12 @@ const addClinicValidationResult = function (req, res, next) {
     });
   } else {
     if (req.files && req.files.length > 0) {
-      const { path } = req.files[0];
-      unlink(path, (err) => {
+      const { path, destination, filename } = req.files[0];
+
+      unlink(destination + filename, (err) => {
         if (err) {
-          res.status(500).json("Internal Server Errors");
+          console.log(err);
+          res.status(500).json("Internal Server Errors!");
         } else {
           res.status(400).json(mappedErrors);
         }

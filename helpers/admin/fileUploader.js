@@ -17,8 +17,16 @@ function fileUpload(req, res, next) {
       });
     } else {
       const base = req.protocol;
-      req.files[0].path = `${base}://${req.headers.host}/images/photo/${req.files[0].filename}`;
-      next();
+      if (req.files && req.files.length > 0) {
+        req.files[0].path = `${base}://${req.headers.host}/images/photo/${req.files[0].filename}`;
+        next();
+      } else {
+        res.status(400).json({
+          image: {
+            msg: "image is required!",
+          },
+        });
+      }
     }
   });
 }
