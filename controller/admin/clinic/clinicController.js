@@ -43,26 +43,6 @@ const inserClinic = (con, data, res) => {
   });
 };
 
-// update blog query
-const updateClinic = (con, data, res) => {
-  const sql = `UPDATE blogs SET departmentID=null,thumbnail = ${JSON.stringify(
-    data.thumnel
-  )},title=${JSON.stringify(
-    data.title
-  )},date=null,timeToRead=null,description=${JSON.stringify(
-    data.description
-  )},tags=${JSON.stringify(data.tags)} WHERE id = ${data.id}`;
-
-  con.query(sql, (err) => {
-    if (err) {
-      // console.log(err);
-      res.status(400).json("Internal server errors!");
-    } else {
-      res.status(200).json("Blog update successfull");
-    }
-  });
-};
-
 // add clinic
 async function addClinic(req, res, next) {
   const { name, phone, email, password, address, latitude, longitude } =
@@ -146,25 +126,65 @@ async function getSingleClinc(req, res, next) {
   });
 }
 
-// delete clinic
+// update clinic
+async function updateClinic(req, res, next) {
+  const { name, email, phone, address, latitude, longitude } = req.body;
+  const { id } = req.params;
 
+  con.query(
+    `UPDATE users SET firstName=${JSON.stringify(name)}, email=${JSON.stringify(
+      email
+    )} WHERE id=${id}`,
+    (err) => {
+      if (err) {
+        res.status(500).json("Internal server errors!");
+      } else {
+        con.query(
+          `UPDATE clinics SET phone=${JSON.stringify(
+            phone
+          )}, address=${JSON.stringify(address)},latitude=${JSON.stringify(
+            latitude
+          )}, longitude=${JSON.stringify(longitude)} WHERE userId =${id}`,
+
+          (err1) => {
+            if (err1) {
+              console.log(err1);
+              res.status(500).json("Internal server errors");
+            } else {
+              res.status(200).json("Clinic Update successfull!");
+            }
+          }
+        );
+      }
+    }
+  );
+}
+
+const fs = require("fs");
+const path = require("path");
+// delete clinic
 async function deleteClinic(req, res, next) {
   if (req.user) {
     const { id } = req.params;
-    con.query(`SELECT * FROM clinics WHERE id =${id}`, (err, rows) => {
+    con.query(`SELECT * FROM clinics WHERE userId =${id}`, (err, rows) => {
       if (err) {
         res.status(500).json("Internal server Errors");
       } else {
         if (rows.length > 0) {
-          const sql = `DELETE FROM users WHERE id = ${rows[0].userId}`;
+          const sql = `DELETE FROM users WHERE id = ${id}`;
           con.query(sql, (err) => {
             if (err) {
               res.status(500).json("Internal server Errors");
             } else {
-              unlink(rows[0].image, (err) => {
+              const fileName = path.parse(rows[0].image).base;
+              const url = path.join(
+                __dirname,
+                `../../../public/images/photo/${fileName}`
+              );
+
+              unlink(url, (err) => {
                 if (err) {
-                  console.log(rows[0].image);
-                  res.status(500).json("Internal server Errors");
+                  res.status(500).json("Internal server Errorse");
                 } else {
                   res.status(200).json("Clinic delete successfull!");
                 }
@@ -180,4 +200,10 @@ async function deleteClinic(req, res, next) {
     req.status(502).json("Authontication failure!");
   }
 }
-module.exports = { addClinic, getClinics, getSingleClinc, deleteClinic };
+module.exports = {
+  addClinic,
+  getClinics,
+  getSingleClinc,
+  deleteClinic,
+  updateClinic,
+};

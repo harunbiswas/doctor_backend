@@ -6,6 +6,8 @@ const {
   addClinic,
   getClinics,
   getSingleClinc,
+  updateClinic,
+  deleteClinic,
 } = require("../controller/admin/clinic/clinicController");
 const {
   login,
@@ -28,6 +30,8 @@ const fileUpload = require("../helpers/admin/fileUploader");
 const {
   addClinicValidators,
   addClinicValidationResult,
+  updateClinicValidators,
+  updateClinicValidatorsResult,
 } = require("../middlewares/admin/clinic/addClinicValidators");
 const {
   doLoginValidators,
@@ -60,6 +64,17 @@ router.post(
 
 //  login clinic
 router.post("/signin", doLoginValidators, doLoginValidatorsResust, login);
+// update clinic
+router.put(
+  "/update/:id",
+  checkLogin,
+  updateClinicValidators,
+  updateClinicValidatorsResult,
+  updateClinic
+);
+
+// delete clinic
+router.delete("/delete/:id", checkLogin, deleteClinic);
 
 // Departments
 router.post(

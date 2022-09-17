@@ -37,6 +37,36 @@ const addClinicValidators = [
     .withMessage("Longitude is required")
     .trim(),
 ];
+const updateClinicValidators = [
+  check("name")
+    .isLength({ min: 1, max: 100 })
+    .withMessage("Name is Required!")
+    .trim(),
+  check("email")
+    .isLength({ min: 1 })
+    .withMessage("Email is required!")
+    .isEmail()
+    .withMessage("Email is not valid!")
+    .trim(),
+  check("phone")
+    .isLength({ min: 1 })
+    .withMessage("Phone is required!")
+    .isMobilePhone()
+    .withMessage("Phone is not valid")
+    .trim(),
+  check("address")
+    .isLength({ min: 1 })
+    .withMessage("address is required!")
+    .trim(),
+  check("latitude")
+    .isLength({ min: 1 })
+    .withMessage("Latitude is required")
+    .trim(),
+  check("longitude")
+    .isLength({ min: 1 })
+    .withMessage("Longitude is required")
+    .trim(),
+];
 
 const addClinicValidationResult = function (req, res, next) {
   const errors = validationResult(req);
@@ -59,8 +89,8 @@ const addClinicValidationResult = function (req, res, next) {
             param: "email",
             location: "body",
           };
-          if (req.files.length > 0) {
-            const { path, destination, filename } = req.files[0];
+          if (req.files && req.files.length > 0) {
+            const { destination, filename } = req.files[0];
             console.log(destination, filename);
             unlink(destination + filename, (err) => {
               if (err) {
@@ -99,7 +129,20 @@ const addClinicValidationResult = function (req, res, next) {
   }
 };
 
+const updateClinicValidatorsResult = function (req, res, next) {
+  const errors = validationResult(req);
+  const mappedErrors = errors.mapped();
+
+  if (Object.keys(mappedErrors).length === 0) {
+    next();
+  } else {
+    res.status(400).json(mappedErrors);
+  }
+};
+
 module.exports = {
   addClinicValidators,
+  updateClinicValidators,
   addClinicValidationResult,
+  updateClinicValidatorsResult,
 };
