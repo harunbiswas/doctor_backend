@@ -7,6 +7,7 @@ function fileUpload(req, res, next) {
     1000000,
     "Only .jpg, jpeg or .png and max 1 mb file allowed!"
   );
+
   upload.any()(req, res, (err) => {
     if (err) {
       res.status(400).json({
@@ -15,6 +16,8 @@ function fileUpload(req, res, next) {
         },
       });
     } else {
+      const base = req.protocol;
+      req.files[0].path = `${base}://${req.headers.host}/images/photo/${req.files[0].filename}`;
       next();
     }
   });

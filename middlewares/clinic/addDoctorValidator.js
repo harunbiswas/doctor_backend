@@ -41,9 +41,8 @@ const addDoctorValidatorsResults = async function (req, res, next) {
 
   if (Object.keys(mappedErrors).length > 0) {
     if (req.files && req.files.length > 0) {
-      const { path } = req.files[0];
-
-      unlink(path, (err) => {
+      const { path, destination, filename } = req.files[0];
+      unlink(destination + filename, (err) => {
         if (err) {
           console.log(err);
           res.status(500).json("Internal Server Errors");
@@ -73,6 +72,7 @@ const addDoctorValidatorsResults = async function (req, res, next) {
           };
           if (req.files && req.files.length > 0) {
             const { path } = req.files[0];
+
             unlink(path, (err) => {
               if (err) {
                 console.log(err);

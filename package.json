@@ -7,7 +7,8 @@
   "license": "MIT",
   "scripts": {
     "start": "NODE_ENV=development nodemon index.js",
-    "prod": "NODE_ENV=production node index.js"
+    "prod": "NODE_ENV=production node index.js",
+    "server": "sudo /opt/lampp/lampp start"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",

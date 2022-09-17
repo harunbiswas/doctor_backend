@@ -40,6 +40,7 @@ function singleUploader(subfolderName, allowedFileType, maxFIleSize, errorMsg) {
       }
     },
   });
+
   return upload;
 }
 

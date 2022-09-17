@@ -156,13 +156,14 @@ async function deleteClinic(req, res, next) {
         res.status(500).json("Internal server Errors");
       } else {
         if (rows.length > 0) {
-          unlink(rows[0].image, (err) => {
+          const sql = `DELETE FROM users WHERE id = ${rows[0].userId}`;
+          con.query(sql, (err) => {
             if (err) {
               res.status(500).json("Internal server Errors");
             } else {
-              const sql = `DELETE FROM users WHERE id = ${rows[0].userId}`;
-              con.query(sql, (err) => {
+              unlink(rows[0].image, (err) => {
                 if (err) {
+                  console.log(rows[0].image);
                   res.status(500).json("Internal server Errors");
                 } else {
                   res.status(200).json("Clinic delete successfull!");
