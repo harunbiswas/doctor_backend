@@ -85,7 +85,7 @@ const deleteDepartment = async function (req, res, next) {
   if (req.user && req.user.role === "clinic") {
     const sql = `SELECT * FROM departments WHERE id= ${JSON.stringify(
       req.params.id
-    )} AND clinicID= ${JSON.stringify(req.user.id)}`;
+    )} `;
 
     con.query(sql, (err, rows) => {
       if (err) {
@@ -94,7 +94,7 @@ const deleteDepartment = async function (req, res, next) {
         if (rows.length > 0) {
           const sql1 = `DELETE FROM departments WHERE id= ${JSON.stringify(
             req.params.id
-          )} AND clinicID= ${JSON.stringify(req.user.id)}`;
+          )}`;
 
           con.query(sql1, (err1) => {
             if (err1) {

@@ -1,8 +1,8 @@
 const bcrypt = require("bcrypt");
 const con = require("../../database/dbConnection");
 const { unlink } = require("fs");
-const { json } = require("express");
-const { body } = require("express-validator");
+
+const path = require("path");
 
 // inser doctor
 const inserdoctor = (con, data, res, req) => {
@@ -170,7 +170,12 @@ async function deletedoctor(req, res, next) {
           res.status(500).json("Internal server Errors!");
         } else {
           if (rows.length > 0) {
-            unlink(JSON.stringify(rows[0].image), (err1) => {
+            const filename = path.parse(rows[0].image).base;
+            const fullPath = path.join(
+              `${__dirname}../../../public/images/photo/`,
+              filename
+            );
+            unlink(fullPath, (err1) => {
               if (err1) {
                 console.log(err1);
                 res.status(500).json("Internal server Error");

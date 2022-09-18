@@ -70,9 +70,9 @@ const addDoctorValidatorsResults = async function (req, res, next) {
             location: "body",
           };
           if (req.files && req.files.length > 0) {
-            const { path } = req.files[0];
+            const { path, destination, filename } = req.files[0];
 
-            unlink(path, (err) => {
+            unlink(destination + filename, (err) => {
               if (err) {
                 console.log(err);
                 res.status(500).json("Internal server error!");
