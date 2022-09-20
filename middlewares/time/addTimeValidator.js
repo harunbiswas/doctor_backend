@@ -6,14 +6,10 @@ const addTimeValidator = [
   check("startTime")
     .isLength({ min: 1 })
     .withMessage("Start Time is required")
-    .isISO8601()
-    .withMessage("Invalid time")
     .trim(),
   check("endTime")
     .isLength({ min: 1 })
     .withMessage("End Time is required")
-    .isISO8601()
-    .withMessage("Invalid time")
     .trim(),
 ];
 
@@ -22,12 +18,14 @@ const addTimeValidatorResult = function (req, res, next) {
   const mappedErrors = errors.mapped();
 
   if (Object.keys(mappedErrors).length === 0) {
-    con.query(`SELECT * FROM users WHERE id= ${req.params.id}`, (err) => {
-      if ((err, rows)) {
-        res.status(500).json("Internal server errors!");
+    const { id } = req.params;
+    con.query(`SELECT * FROM doctors WHERE userId= ${id}`, (err, rows) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json("Internal server errors");
       } else {
         if (rows.length > 0) {
-          req.body.id = rows[0].doctorId;
+          req.body.id = rows[0].id;
           next();
         } else {
           res.status(400).json("Doctor not found!");

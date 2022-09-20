@@ -8,7 +8,11 @@ const {
   getExperience,
   deleteExperience,
 } = require("../controller/experience/experienceController");
-const { addTime } = require("../controller/time/timeController");
+const {
+  addTime,
+  getTime,
+  deleteTime,
+} = require("../controller/time/timeController");
 const { checkLogin } = require("../middlewares/common/checkLogin");
 const {
   addExperienceValidator,
@@ -46,7 +50,7 @@ router.get("/experience/:id", getExperience);
 router.delete("/experience/:id", checkLogin, deleteExperience);
 
 // time table
-router.get("/time/:id");
+router.get("/time/:id", getTime);
 router.post(
   "/time/:id",
   checkLogin,
@@ -54,5 +58,7 @@ router.post(
   addTimeValidatorResult,
   addTime
 );
+
+router.delete("/time/:id", checkLogin, deleteTime);
 
 module.exports = router;

@@ -47,10 +47,6 @@ const {
   addDoctorValidatorsResults,
 } = require("../middlewares/clinic/addDoctorValidator");
 const { checkLogin } = require("../middlewares/common/checkLogin");
-const {
-  addTimeValidator,
-  addTimeValidatorResult,
-} = require("../middlewares/time/addTimeValidator");
 
 const router = express.Router();
 
