@@ -32,15 +32,15 @@ router.get("/departments", getDepartmentFrontend);
 router.get("/doctors", getfrontendDoctors);
 
 // serch filter
-router.get(
-  "/search/clinic",
+router.post(
+  "/search/clinics",
   clinicSearcValidation,
   clinicSearchValidationResult,
   searchClinic
 );
 
-router.get(
-  "/search/doctor",
+router.post(
+  "/search/doctors",
   doctorSearcValidation,
   doctorSearchValidationResult,
   searchDector
