@@ -1,5 +1,8 @@
 const express = require("express");
 const {
+  payBill,
+} = require("../controller/frontend/billingController/billingController");
+const {
   getDepartmentFrontend,
 } = require("../controller/frontend/frontendDepartmentController");
 const {
@@ -45,4 +48,7 @@ router.post(
   doctorSearchValidationResult,
   searchDector
 );
+
+// billing
+router.post("/pay", payBill);
 module.exports = router;
