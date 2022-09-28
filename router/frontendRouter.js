@@ -15,6 +15,7 @@ const {
 const {
   createSubscription,
   updateSubscription,
+  getSubscription,
 } = require("../controller/frontend/subscriptionController");
 const { checkLogin } = require("../middlewares/common/checkLogin");
 const {
@@ -57,4 +58,5 @@ router.post(
 // billing
 router.post("/subscription", checkLogin, createSubscription);
 router.put("/subscription", checkLogin, updateSubscription);
+router.get("/subscription", checkLogin, getSubscription);
 module.exports = router;

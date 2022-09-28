@@ -167,7 +167,34 @@ async function updateSubscription(req, res, next) {
     res.status(400).json("Authontication failured!");
   }
 }
+
+async function getSubscription(req, res, next) {
+  if (req.user && req.user.role === "patient") {
+    con.query(
+      `SELECT * FROM patients WHERE userId = ${req.user.id}`,
+      (err, rows) => {
+        if (err && rows.length === 0) {
+          res.status(500).json("Internal server errors!");
+        } else {
+          con.query(
+            `SELECT * FROM subscriptions WHERE patientId=${rows[0].id}`,
+            (err1, rows1) => {
+              if (err1) {
+                res.status(500).json("Internal server errors");
+              } else {
+                res.status(200).json(rows1);
+              }
+            }
+          );
+        }
+      }
+    );
+  } else {
+    res.status(400).json("Authontication failured!");
+  }
+}
 module.exports = {
   createSubscription,
   updateSubscription,
+  getSubscription,
 };
