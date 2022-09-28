@@ -12,19 +12,15 @@ const checkLogin = async (req, res, next) => {
       next();
     } catch (err) {
       res.status(400).json({
-        errors: {
-          common: {
-            msg: "Authentication failure!",
-          },
+        common: {
+          msg: "Authentication failure!",
         },
       });
     }
   } else {
     res.status(400).json({
-      errors: {
-        common: {
-          msg: "Authentication failure!",
-        },
+      common: {
+        msg: "Authentication failured!",
       },
     });
   }

@@ -13,6 +13,11 @@ const {
   searchDector,
 } = require("../controller/frontend/searchController");
 const {
+  createSubscription,
+  updateSubscription,
+} = require("../controller/frontend/subscriptionController");
+const { checkLogin } = require("../middlewares/common/checkLogin");
+const {
   clinicSearcValidation,
   clinicSearchValidationResult,
   doctorSearcValidation,
@@ -50,5 +55,6 @@ router.post(
 );
 
 // billing
-router.post("/pay", payBill);
+router.post("/subscription", checkLogin, createSubscription);
+router.put("/subscription", checkLogin, updateSubscription);
 module.exports = router;
