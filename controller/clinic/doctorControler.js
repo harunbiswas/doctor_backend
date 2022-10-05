@@ -137,7 +137,7 @@ async function getdoctors(req, res, next) {
 //get single doctor
 async function getSingleDoctor(req, res, next) {
   const { id } = req.params;
-  const sql = `SELECT *, "" as password FROM users RIGHT JOIN doctors ON doctors.userId= users.id JOIN departments ON departments.id = doctors.departmentId  WHERE users.id = ${id}`;
+  const sql = `SELECT *, "" as password, doctors.id FROM users RIGHT JOIN doctors ON doctors.userId= users.id JOIN departments ON departments.id = doctors.departmentId  WHERE users.id = ${id}`;
 
   con.query(sql, (err, rows) => {
     if (err) {

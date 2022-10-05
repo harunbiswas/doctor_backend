@@ -23,6 +23,12 @@ const addAppointmentValidator = [
     .isLength({ min: 1 })
     .withMessage("Clinic is required")
     .trim(),
+  check("payment")
+    .isLength({
+      min: 1,
+    })
+    .withMessage("Payment is required")
+    .trim(),
 ];
 
 const addAppointmentResult = function (req, res, next) {

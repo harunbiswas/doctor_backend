@@ -17,6 +17,10 @@ const {
   updateSubscription,
   getSubscription,
 } = require("../controller/frontend/subscriptionController");
+const {
+  addAppointmentValidator,
+  addAppointmentResult,
+} = require("../middlewares/appointment/addAppoitmentValidator");
 const { checkLogin } = require("../middlewares/common/checkLogin");
 const {
   clinicSearcValidation,
@@ -59,4 +63,7 @@ router.post(
 router.post("/subscription", checkLogin, createSubscription);
 router.put("/subscription", checkLogin, updateSubscription);
 router.get("/subscription", checkLogin, getSubscription);
+
+// appointments
+
 module.exports = router;

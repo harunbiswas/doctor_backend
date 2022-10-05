@@ -1,10 +1,58 @@
-const { json } = require("express");
 const con = require("../../database/dbConnection");
-const { get } = require("../../router/appointmentRouter");
+
+const nodemailer = require("nodemailer");
+const { google } = require("googleapis");
+
+// These id's and secrets should come from .env file.
+const CLIENT_ID =
+  "527370249281-7rrbhlfn2eq41a6vji71rlqm3mau2m3q.apps.googleusercontent.com";
+const CLEINT_SECRET = "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";
+const REDIRECT_URI = "https://developers.google.com/oauthplayground";
+const REFRESH_TOKEN =
+  "1//041jONos9y4FGCgYIARAAGAQSNwF-L9IrzI6hF7k7JVm4PWDM_eKr16qiT_lDfnv2d5JK5VMVg71ya80E9O4G7u8sgZeSqN538xs";
+
+const oAuth2Client = new google.auth.OAuth2(
+  CLIENT_ID,
+  CLEINT_SECRET,
+  REDIRECT_URI
+);
+oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+
+async function sendMail(mail) {
+  try {
+    const accessToken = await oAuth2Client.getAccessToken();
+
+    const transport = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        type: "OAuth2",
+        user: mail,
+        clientId: CLIENT_ID,
+        clientSecret: CLEINT_SECRET,
+        refreshToken: REFRESH_TOKEN,
+        accessToken: accessToken,
+      },
+    });
+
+    const mailOptions = {
+      from: "Estetix Confirmations <booking.estetix@gmail.com>",
+      to: 'to:"harunbiswasrubel@gmail.com"',
+      //cc: 'booking.estetix@gmail.com',
+      subject: "Booking confirmed",
+      text: "Dear customer we inform you that your booking was confirmed",
+      html: "<h1>Dear customer we inform you that your booking was confirmed</h1>",
+    };
+
+    const result = await transport.sendMail(mailOptions);
+    return result;
+  } catch (error) {
+    return error;
+  }
+}
 
 // inser appointment
 const inserAppintment = (con, res, data) => {
-  const sql = `INSERT INTO appointments(patientId, doctorId, departmentId, name, email, date, phone, comments, age, clinicId) VALUES(${JSON.stringify(
+  const sql = `INSERT INTO appointments(patientId, doctorId, departmentId, name, email, date, phone, comments, age, clinicId, paymentType) VALUES(${JSON.stringify(
     data.patientId
   )}, ${JSON.stringify(data.doctorId)},${JSON.stringify(
     data.departmentId
@@ -14,14 +62,45 @@ const inserAppintment = (con, res, data) => {
     data.phone
   )},${JSON.stringify(data.comments)}, ${JSON.stringify(
     data.age
-  )}, ${JSON.stringify(data.clinicId)})`;
+  )}, ${JSON.stringify(data.clinicId)}, ${JSON.stringify(data.payment)})`;
 
   con.query(sql, (err) => {
     if (err) {
       console.log(err);
       res.status(500).json("Internal Server Errors");
     } else {
-      res.status(200).json("Appointment create successfull");
+      sendMail(data.email)
+        .then((result) => {
+          con.query(
+            `SELECT * FROM doctors WHERE id=${data.doctorId}`,
+            (err1, rows) => {
+              if (err1 || rows.length === 0) {
+                console.log(err1);
+                res.status(500).json("Internal Server Errors!");
+              } else
+                con.query(
+                  `SELECT * FROM users WHERE id=${rows[0].userId}`,
+                  (err2, rows1) => {
+                    if (err2 || rows1.length === 0) {
+                      console.log(err2);
+                      res.status(500).json("Internal Server Errorse");
+                    } else {
+                      sendMail(rows1[0].email)
+                        .then((result) => {
+                          res.status(200).json("Appointment successfull");
+                        })
+                        .catch((e) => {
+                          res.status(500).json("Internal Server Errors");
+                        });
+                    }
+                  }
+                );
+            }
+          );
+        })
+        .catch((error) => {
+          res.status(500).json("Internal Server Errors");
+        });
     }
   });
 };
@@ -39,6 +118,7 @@ const addAppointment = function (req, res, next) {
     comments,
     age,
     date,
+    payment,
   } = req.body;
   const data = {
     patientId: patientId || null,
@@ -51,6 +131,7 @@ const addAppointment = function (req, res, next) {
     comments: comments || null,
     age,
     clinicId,
+    payment,
   };
   con.query(
     `SELECT * FROM clinics WHERE id = ${JSON.stringify(clinicId)}`,
@@ -77,7 +158,7 @@ const addAppointment = function (req, res, next) {
                         res.status(500).json("Internal server errors!");
                       } else {
                         if (rows1.length > 0) {
-                          inserAppintment(con, res, data);
+                          inserAppintment(con, res, data, rows);
                         } else {
                           res.status(400).json("Doctor not found!");
                         }
