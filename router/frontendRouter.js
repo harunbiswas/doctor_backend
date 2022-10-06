@@ -1,7 +1,11 @@
 const express = require("express");
+const { getDoctorInfo } = require("../controller/doctor/doctorController");
 const {
   payBill,
 } = require("../controller/frontend/billingController/billingController");
+const {
+  getDoctors,
+} = require("../controller/frontend/doctorController/frontendDoctorController");
 const {
   getDepartmentFrontend,
 } = require("../controller/frontend/frontendDepartmentController");
@@ -64,6 +68,7 @@ router.post("/subscription", checkLogin, createSubscription);
 router.put("/subscription", checkLogin, updateSubscription);
 router.get("/subscription", checkLogin, getSubscription);
 
-// appointments
+// doctors
+router.get("/frDoctors", getDoctors);
 
 module.exports = router;

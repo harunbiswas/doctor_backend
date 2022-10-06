@@ -10,7 +10,7 @@ const isLeapyear = (year) => {
 };
 
 async function createSubscription(req, res, next) {
-  if (req.user && req.user.role === "patient") {
+  if (req.user && req.user.role === "clinic") {
     if (req.body) {
       const date = new Date();
       const time =
@@ -33,21 +33,21 @@ async function createSubscription(req, res, next) {
         expireDate.getDate();
 
       con.query(
-        `SELECT * FROM patients WHERE userId = ${req.user.id}`,
+        `SELECT * FROM clinics WHERE userId = ${req.user.id}`,
         (err, rows) => {
           if (err) {
             res.status(500).json("Internal server errors");
           } else {
             if (rows.length > 0) {
               con.query(
-                `SELECT * FROM subscriptions WHERE patientId = ${rows[0].id}`,
+                `SELECT * FROM subscriptions WHERE clinicId = ${rows[0].id}`,
                 (err, rows1) => {
-                  if ((err, rows1.length === 0)) {
-                    const sql = `INSERT INTO subscriptions(patientId, token, expireDate) VALUES(${
+                  if (err || rows1.length === 0) {
+                    const sql = `INSERT INTO subscriptions(clinicId, token, expireDate, paymentType) VALUES(${
                       rows[0].id
                     }, ${JSON.stringify(token)}, ${JSON.stringify(
                       expireDate
-                    )})`;
+                    )}, "card")`;
                     con.query(sql, (err) => {
                       if (err) {
                         res.status(500).json("Internal server errors!");
@@ -80,10 +80,10 @@ async function createSubscription(req, res, next) {
 }
 
 async function updateSubscription(req, res, next) {
-  if (req.user && req.user.role === "patient") {
+  if (req.user && req.user.role === "clinic") {
     if (req.body) {
       con.query(
-        `SELECT * FROM patients WHERE userId = ${req.user.id}`,
+        `SELECT * FROM clinics WHERE userId = ${req.user.id}`,
         (err, rows) => {
           if (err) {
             console.log(err);
@@ -91,7 +91,7 @@ async function updateSubscription(req, res, next) {
           } else {
             if (rows.length > 0) {
               con.query(
-                `SELECT * FROM subscriptions WHERE patientId = ${rows[0].id}`,
+                `SELECT * FROM subscriptions WHERE clinicId = ${rows[0].id}`,
                 (err, rows1) => {
                   if ((err, rows1.length > 0)) {
                     const date = new Date();
@@ -169,15 +169,15 @@ async function updateSubscription(req, res, next) {
 }
 
 async function getSubscription(req, res, next) {
-  if (req.user && req.user.role === "patient") {
+  if (req.user && req.user.role === "clinic") {
     con.query(
-      `SELECT * FROM patients WHERE userId = ${req.user.id}`,
+      `SELECT * FROM clinics WHERE userId = ${req.user.id}`,
       (err, rows) => {
         if (err && rows.length === 0) {
           res.status(500).json("Internal server errors!");
         } else {
           con.query(
-            `SELECT * FROM subscriptions WHERE patientId=${rows[0].id}`,
+            `SELECT * FROM subscriptions WHERE clinicId=${rows[0].id}`,
             (err1, rows1) => {
               if (err1) {
                 res.status(500).json("Internal server errors");
