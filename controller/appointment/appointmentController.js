@@ -18,7 +18,7 @@ const oAuth2Client = new google.auth.OAuth2(
 );
 oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 
-async function sendMail(mail) {
+async function sendMail(mail, text) {
   try {
     const accessToken = await oAuth2Client.getAccessToken();
 
@@ -26,7 +26,7 @@ async function sendMail(mail) {
       service: "gmail",
       auth: {
         type: "OAuth2",
-        user: mail,
+        user: "booking.estetix@gmail.com",
         clientId: CLIENT_ID,
         clientSecret: CLEINT_SECRET,
         refreshToken: REFRESH_TOKEN,
@@ -36,11 +36,11 @@ async function sendMail(mail) {
 
     const mailOptions = {
       from: "Estetix Confirmations <booking.estetix@gmail.com>",
-      to: 'to:"harunbiswasrubel@gmail.com"',
+      to: `to:${mail}`,
       //cc: 'booking.estetix@gmail.com',
       subject: "Booking confirmed",
-      text: "Dear customer we inform you that your booking was confirmed",
-      html: "<h1>Dear customer we inform you that your booking was confirmed</h1>",
+      text: `${text}`,
+      html: `<h1>${text}</h1>`,
     };
 
     const result = await transport.sendMail(mailOptions);
@@ -69,7 +69,10 @@ const inserAppintment = (con, res, data) => {
       console.log(err);
       res.status(500).json("Internal Server Errors");
     } else {
-      sendMail(data.email)
+      sendMail(
+        data.email,
+        "Dear customer we inform you that your booking was confirmed"
+      )
         .then((result) => {
           con.query(
             `SELECT * FROM doctors WHERE id=${data.doctorId}`,
@@ -85,7 +88,10 @@ const inserAppintment = (con, res, data) => {
                       console.log(err2);
                       res.status(500).json("Internal Server Errorse");
                     } else {
-                      sendMail(rows1[0].email)
+                      sendMail(
+                        rows1[0].email,
+                        "Dear Doctor we inform you that your get A new booking"
+                      )
                         .then((result) => {
                           res.status(200).json("Appointment successfull");
                         })
